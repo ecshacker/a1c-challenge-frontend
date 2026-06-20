@@ -340,8 +340,7 @@ const btnPrimary: React.CSSProperties = { flex: 1, fontFamily: SERIF, fontSize: 
 const btnSecondary: React.CSSProperties = { flex: 1, fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.inkSoft, background: "transparent", border: `1px solid ${C.line}`, borderRadius: 5, padding: "14px", cursor: "pointer" };
 
 export default function WeeklyCheckInPage() {
-  const token = getToken();
-
+  const [token,          setToken]          = useState<string | null>(null);
   const [self,           setSelf]           = useState<ParticipantSelf | null>(null);
   const [studyWeek,      setStudyWeek]      = useState<number>(1);
   const [baselineEditable, setBaselineEditable] = useState(true);
@@ -378,6 +377,11 @@ export default function WeeklyCheckInPage() {
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isWeek1 = studyWeek === 1;
+
+  // Defer token read to client-only to avoid SSR hydration mismatch
+  useEffect(() => {
+    setToken(getToken());
+  }, []);
 
   // On mount: fetch participant state and any existing draft
   useEffect(() => {
