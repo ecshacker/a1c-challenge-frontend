@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
 import { setPendingToken, persistToken } from "@/lib/token";
@@ -14,12 +14,12 @@ const SERIF = "'Merriweather', Georgia, 'Times New Roman', serif";
 const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
 const WELLBEING = [
-  { key: "energy",   label: "Energy",    low: "low",     high: "high"    },
-  { key: "mood",     label: "Mood",      low: "low",     high: "high"    },
-  { key: "digestion",label: "Digestion", low: "rough",   high: "easy"    },
-  { key: "sleep",    label: "Sleep",     low: "poor",    high: "sound"   },
-  { key: "hydration",label: "Hydration", low: "low",     high: "high"    },
-  { key: "comfort",  label: "Comfort",   low: "in pain", high: "at ease" },
+  { id: "energy",   label: "Energy",    low: "low",     high: "high"    },
+  { id: "mood",     label: "Mood",      low: "low",     high: "high"    },
+  { id: "digestion",label: "Digestion", low: "rough",   high: "easy"    },
+  { id: "sleep",    label: "Sleep",     low: "poor",    high: "sound"   },
+  { id: "hydration",label: "Hydration", low: "low",     high: "high"    },
+  { id: "comfort",  label: "Comfort",   low: "in pain", high: "at ease" },
 ];
 
 const STEPS = ["Eligibility", "Your baseline", "How you're starting", "A few details"];
@@ -205,9 +205,19 @@ function Field({ label, optional, children }: { label: string; optional?: boolea
   );
 }
 
-function AgeContext({ ctx }: { ctx: { pct: string; group: string; note: string } }) {
+function AgeContext({ ctx, onDismiss }: { ctx: { pct: string; group: string; note: string }; onDismiss: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onDismiss();
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [onDismiss]);
   return (
-    <div className="a1c-fade" style={{ marginTop: 12, padding: "14px 16px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 7 }}>
+    <div ref={ref} className="a1c-fade" style={{ marginTop: 12, padding: "14px 16px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 7, position: "relative" }}>
+      <button onClick={onDismiss} aria-label="Dismiss"
+              style={{ position: "absolute", top: 10, right: 12, fontFamily: MONO, fontSize: 16, lineHeight: 1, color: C.inkFaint, background: "none", border: "none", cursor: "pointer", padding: "2px 4px" }}>×</button>
       <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 7 }}>You&rsquo;re not alone in this</div>
       <div style={{ fontFamily: SERIF, fontSize: 15, lineHeight: 1.6, color: C.inkSoft }}>
         <strong style={{ color: C.ink, fontWeight: 700 }}>{ctx.pct} of {ctx.group}</strong> are in the prediabetes range too — so you&rsquo;re far from the only one your age watching these numbers. {ctx.note}
@@ -262,6 +272,7 @@ export default function EnrollmentIntakePage() {
 
   // details (step 3)
   const [ageBand, setAgeBand] = useState("");  // schema value e.g. "18-29"
+  const [ageCtxDismissed, setAgeCtxDismissed] = useState(false);
   const [sex, setSex] = useState("");
   const [country, setCountry] = useState("");
   const [ethnicity, setEthnicity] = useState("");
@@ -457,8 +468,8 @@ export default function EnrollmentIntakePage() {
           {step === 2 && (
             <div className="a1c-fade">
               <p style={lead}>How you feel today, so there&rsquo;s something to compare against later. Each is 1 to 5 — blank is a fine answer.</p>
-              {WELLBEING.map((d) => (
-                <Scale key={d.key} {...d} value={wb[d.key]} onPick={(v) => setWb({ ...wb, [d.key]: v })} />
+              {WELLBEING.map(({ id, ...rest }) => (
+                <Scale key={id} {...rest} value={wb[id]} onPick={(v) => setWb({ ...wb, [id]: v })} />
               ))}
               <div style={{ height: 1, background: C.lineSoft, margin: "24px 0 20px" }} />
               <Field label="Hemp seed you intend to eat daily">
@@ -479,11 +490,13 @@ export default function EnrollmentIntakePage() {
               <p style={lead}>A little context for the data — kept coarse on purpose, so nothing here can point back to you.</p>
 
               <Field label="Age">
-                <select value={ageBand} onChange={(e) => setAgeBand(e.target.value)} style={sel}>
+                <select value={ageBand} onChange={(e) => { setAgeBand(e.target.value); setAgeCtxDismissed(false); }} style={sel}>
                   <option value="">Select…</option>
                   {AGE_BAND_LABELS.map(([label, val]) => <option key={val} value={val}>{label}</option>)}
                 </select>
-                {ageBand && AGE_CONTEXT[ageBand] && <AgeContext ctx={AGE_CONTEXT[ageBand]} />}
+                {ageBand && AGE_CONTEXT[ageBand] && !ageCtxDismissed && (
+                  <AgeContext ctx={AGE_CONTEXT[ageBand]} onDismiss={() => setAgeCtxDismissed(true)} />
+                )}
               </Field>
 
               <Field label="Sex" optional>
@@ -493,7 +506,15 @@ export default function EnrollmentIntakePage() {
               <Field label="Country">
                 <select value={country} onChange={(e) => setCountry(e.target.value)} style={sel}>
                   <option value="">Select…</option>
-                  {["United States", "Canada", "United Kingdom", "Australia", "Germany", "Other"].map((c) => <option key={c}>{c}</option>)}
+                  {[
+                    "Australia", "Austria", "Belgium", "Brazil", "Canada", "Chile", "Colombia",
+                    "Costa Rica", "Czech Republic", "Denmark", "Finland", "France", "Germany",
+                    "Greece", "Hungary", "Iceland", "India", "Ireland", "Israel", "Italy",
+                    "Japan", "Luxembourg", "Malta", "Mexico", "Netherlands", "New Zealand",
+                    "Norway", "Peru", "Poland", "Portugal", "Romania", "Singapore", "Slovenia",
+                    "South Africa", "South Korea", "Spain", "Sweden", "Switzerland", "Thailand",
+                    "United Kingdom", "United States", "Uruguay", "Other",
+                  ].map((c) => <option key={c}>{c}</option>)}
                 </select>
                 <Note>Country only — never anything more local.</Note>
               </Field>

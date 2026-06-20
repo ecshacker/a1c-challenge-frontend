@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type ParticipantSelf } from "@/lib/api";
 
@@ -12,14 +12,11 @@ const C = {
 const SERIF = "'Merriweather', Georgia, 'Times New Roman', serif";
 const MONO  = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
-// Build upcoming Monday options using LOCAL time — never toISOString() which rolls
-// western-hemisphere Mondays back to Sunday in UTC.
 function upcomingMondays() {
   const today = new Date();
   const daysToMon = (1 - today.getDay() + 7) % 7;
   const m1 = new Date(today); m1.setDate(today.getDate() + daysToMon);
   const m2 = new Date(m1);    m2.setDate(m1.getDate() + 7);
-
   const fmt   = (d: Date) => d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
   const toISO = (d: Date) => {
     const y  = d.getFullYear();
@@ -76,6 +73,75 @@ function RowLabel({ children }: { children: React.ReactNode }) {
   return <div style={{ fontFamily: SERIF, fontSize: 15.5, fontWeight: 700, color: C.ink, marginBottom: 8 }}>{children}</div>;
 }
 
+function ReminderStrip({ startLabel }: { startLabel: string }) {
+  const [showCal, setShowCal] = useState(false);
+  const [calDay,  setCalDay]  = useState(1); // default Monday
+  const linkRef = useRef<HTMLAnchorElement>(null);
+
+  const buildAndDownload = () => {
+    const byday = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"][calDay];
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const ics = [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//A1C Challenge//Check-in//EN", "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT", `UID:a1c-${Date.now()}@a1c-challenge`, `DTSTAMP:${stamp}`,
+      "SUMMARY:A1C Challenge — weekly check-in",
+      `DESCRIPTION:Your weekly A1C Challenge check-in. Started ${startLabel}.`,
+      `RRULE:FREQ=WEEKLY;BYDAY=${byday}`, "DURATION:PT10M",
+      "BEGIN:VALARM", "ACTION:DISPLAY", "TRIGGER:-PT0M", "DESCRIPTION:A1C Challenge check-in", "END:VALARM",
+      "END:VEVENT", "END:VCALENDAR",
+    ].join("\r\n");
+    const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+    const a = linkRef.current!;
+    a.href = url; a.download = "a1c-checkin-reminder.ics"; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const fbShare = () => {
+    const url = encodeURIComponent(typeof window !== "undefined" ? window.location.origin : "");
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank", "noopener,width=600,height=400");
+  };
+
+  return (
+    <div style={{ marginTop: 20, padding: "16px 18px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
+      <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 12 }}>
+        Don&rsquo;t lose track
+      </div>
+
+      {!showCal ? (
+        <button onClick={() => setShowCal(true)} className="a1c-ghost"
+                style={{ display: "block", fontFamily: SERIF, fontSize: 15, fontWeight: 700, color: C.accentDeep, background: "none", border: "none", padding: 0, cursor: "pointer", marginBottom: 12, textAlign: "left" }}>
+          + Add a weekly reminder to your calendar
+        </button>
+      ) : (
+        <div className="a1c-fade" style={{ marginBottom: 14 }}>
+          <div style={{ fontFamily: SERIF, fontSize: 14, color: C.inkSoft, marginBottom: 8 }}>Remind me on</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, flexWrap: "wrap" }}>
+            <select value={calDay} onChange={(e) => setCalDay(Number(e.target.value))}
+                    style={{ fontFamily: SERIF, fontSize: 14.5, padding: "8px 10px", borderRadius: 5, border: `1px solid ${C.line}`, background: C.pageBg, color: C.ink }}>
+              {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((d, i) => (
+                <option key={d} value={i}>{d}s</option>
+              ))}
+            </select>
+            <button onClick={buildAndDownload} className="a1c-btn a1c-primary"
+                    style={{ fontFamily: SERIF, fontSize: 14.5, fontWeight: 700, color: C.card, background: C.accent, border: "none", borderRadius: 5, padding: "8px 16px", cursor: "pointer" }}>
+              Save reminder
+            </button>
+            <a ref={linkRef} style={{ display: "none" }} />
+          </div>
+        </div>
+      )}
+
+      <button onClick={fbShare} className="a1c-ghost"
+              style={{ display: "block", fontFamily: SERIF, fontSize: 15, fontWeight: 700, color: C.inkSoft, background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}>
+        + Tell someone on Facebook
+        <span style={{ display: "block", fontFamily: SERIF, fontSize: 12.5, fontWeight: 400, color: C.inkFaint, marginTop: 3 }}>
+          Shares the study, not your numbers — nothing here identifies you.
+        </span>
+      </button>
+    </div>
+  );
+}
+
 const micro: React.CSSProperties = { fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.5, color: C.inkSoft, margin: "0 0 13px" };
 const inp: React.CSSProperties   = { fontFamily: MONO, fontSize: 15.5, padding: "9px 11px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 5, color: C.ink };
 
@@ -93,6 +159,7 @@ export default function StartDayOnePage() {
   const [error,         setError]         = useState<string | null>(null);
   const [existingStart, setExistingStart] = useState<string | null>(null);
   const [locked,        setLocked]        = useState(false);
+  const [studyWeek,     setStudyWeek]     = useState<number | null>(null);
 
   useEffect(() => {
     api.get("/participants/me")
@@ -102,12 +169,13 @@ export default function StartDayOnePage() {
           setExistingStart(p.startDate);
           setLocked(true);
         }
+        setStudyWeek(p.studyWeek);
         if (p.baselineFructosamine) {
           setFruct(String(p.baselineFructosamine));
           setFructHow(p.baselineFructosamineTestType ?? "");
         }
       })
-      .catch(() => { /* not fatal — participant may not have token yet */ });
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -117,7 +185,11 @@ export default function StartDayOnePage() {
   }, [toast]);
 
   const handleBegin = async () => {
-    if (locked) { router.push("/check-in"); return; }
+    if (locked) {
+      // Only navigate to check-in if the week has actually started
+      if (studyWeek != null && studyWeek >= 1) router.push("/check-in");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -130,7 +202,11 @@ export default function StartDayOnePage() {
         });
       }
 
-      router.push("/check-in");
+      // Stay on this page — show the "Your start is set" card with reminder options
+      setExistingStart(mondays[start].iso);
+      setLocked(true);
+      // Re-fetch to pick up studyWeek (may now be 1 if they chose today's Monday)
+      api.get("/participants/me").then((d) => setStudyWeek((d as ParticipantSelf).studyWeek)).catch(() => {});
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 409) {
@@ -147,6 +223,11 @@ export default function StartDayOnePage() {
     }
   };
 
+  // Label for the footer button when start is already set
+  const lockedButtonLabel = studyWeek != null && studyWeek >= 1
+    ? "Go to my check-in →"
+    : "Start date saved — see you Monday";
+
   return (
     <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
       <style>{`
@@ -160,7 +241,7 @@ export default function StartDayOnePage() {
         .a1c-fade { animation: a1cFade .35s ease both; }
         @media (prefers-reduced-motion: reduce){ .a1c-fade{ animation:none; } }
         @keyframes a1cFade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-        input { font-family: ${MONO}; }
+        input,select { font-family: ${MONO}; }
       `}</style>
 
       <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
@@ -178,12 +259,17 @@ export default function StartDayOnePage() {
           <div style={{ height: 1, background: C.line, margin: "18px 0 20px" }} />
 
           {locked && existingStart && (
-            <div style={{ padding: "14px 16px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 8, marginBottom: 20 }}>
-              <div style={{ fontFamily: SERIF, fontSize: 15.5, color: C.ink, fontWeight: 700 }}>Your start is set</div>
-              <div style={{ fontFamily: MONO, fontSize: 14, color: C.accentDeep, marginTop: 6 }}>{existingStart}</div>
-              <div style={{ fontFamily: SERIF, fontSize: 14, color: C.inkSoft, marginTop: 6 }}>
-                Your exposure clock is running. Head to your weekly check-in.
+            <div className="a1c-fade">
+              <div style={{ padding: "14px 16px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 8 }}>
+                <div style={{ fontFamily: SERIF, fontSize: 15.5, color: C.ink, fontWeight: 700 }}>Your start is set</div>
+                <div style={{ fontFamily: MONO, fontSize: 14, color: C.accentDeep, marginTop: 6 }}>{existingStart}</div>
+                <div style={{ fontFamily: SERIF, fontSize: 14, color: C.inkSoft, marginTop: 6 }}>
+                  {studyWeek != null && studyWeek >= 1
+                    ? "Your exposure clock is running. Head to your weekly check-in."
+                    : "Your exposure clock starts Monday. Come back then to log your first week."}
+                </div>
               </div>
+              <ReminderStrip startLabel={existingStart} />
             </div>
           )}
 
@@ -244,12 +330,15 @@ export default function StartDayOnePage() {
 
       <div style={{ borderTop: `1px solid ${C.line}`, background: C.card, flexShrink: 0 }}>
         <div style={{ maxWidth: 580, margin: "0 auto", padding: "13px 22px 15px" }}>
-          <button className="a1c-btn a1c-primary" onClick={handleBegin} disabled={loading}
-                  style={{ width: "100%", fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: loading ? C.line : C.accent, border: "none", borderRadius: 6, padding: "14px", cursor: loading ? "not-allowed" : "pointer" }}>
-            {loading ? "Setting your start…" : locked ? "Go to week 1 →" : "Begin week 1"}
+          <button className="a1c-btn a1c-primary" onClick={handleBegin}
+                  disabled={loading || (locked && (studyWeek == null || studyWeek < 1))}
+                  style={{ width: "100%", fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: loading ? C.line : locked && (studyWeek == null || studyWeek < 1) ? C.line : C.accent, border: "none", borderRadius: 6, padding: "14px", cursor: loading || (locked && (studyWeek == null || studyWeek < 1)) ? "default" : "pointer" }}>
+            {loading ? "Setting your start…" : locked ? lockedButtonLabel : "Set my start date"}
           </button>
           <p style={{ fontFamily: SERIF, fontSize: 12.5, color: C.inkFaint, margin: "10px 2px 0", textAlign: "center" }}>
-            Your start must be on a Monday. Return any time that week to fill in the weekly data.
+            {locked
+              ? "Come back on your start date to log week 1."
+              : "Your start must be on a Monday. Return any time that week to fill in the weekly data."}
           </p>
         </div>
       </div>

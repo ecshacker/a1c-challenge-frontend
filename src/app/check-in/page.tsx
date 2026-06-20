@@ -390,8 +390,8 @@ export default function WeeklyCheckInPage() {
       .then(([meData]) => {
         const p = meData as ParticipantSelf;
         setSelf(p);
-        const wk = p.studyWeek ?? 1;
-        setStudyWeek(wk);
+        const wk = p.studyWeek ?? null;
+        setStudyWeek(wk ?? 1);
         setBaselineEditable(p.baselineEditable);
         setBaseA1c(p.baselineA1c ? String(p.baselineA1c) : "");
         setBaseFruct(p.baselineFructosamine ? String(p.baselineFructosamine) : "");
@@ -534,6 +534,22 @@ export default function WeeklyCheckInPage() {
     return (
       <div style={{ background: C.pageBg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
         <div style={{ fontFamily: SERIF, fontSize: 16, color: C.inkSoft, textAlign: "center" }}>{mountError}</div>
+      </div>
+    );
+  }
+
+  if (self && (self.studyWeek == null || self.studyWeek < 1)) {
+    return (
+      <div style={{ background: C.pageBg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ maxWidth: 380, textAlign: "center" }}>
+          <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 26, color: C.ink, marginBottom: 14 }}>Not quite yet</div>
+          <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, marginBottom: 22 }}>
+            Your first week starts on <strong style={{ color: C.ink }}>{self.startDate ?? "your chosen Monday"}</strong>. Come back then to log week 1.
+          </div>
+          <a href="/day-one" style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "12px 24px", textDecoration: "none", display: "inline-block" }}>
+            Back to day one
+          </a>
+        </div>
       </div>
     );
   }
