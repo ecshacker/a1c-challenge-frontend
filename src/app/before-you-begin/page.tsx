@@ -1,17 +1,11 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type ParticipantSelf } from "@/lib/api";
 import { getToken, setPendingToken, persistToken, clearToken } from "@/lib/token";
 
-const C = {
-  pageBg: "#E6E5DD", card: "#F7F6F2", ink: "#222420", inkSoft: "#595C50",
-  inkFaint: "#8A8C80", line: "#D4D3C8", lineSoft: "#E0DFD6",
-  accent: "#586B4D", accentDeep: "#43543A", accentTint: "#EAEDE3",
-};
-const SERIF = "'Merriweather', Georgia, 'Times New Roman', serif";
-const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+import { C, SERIF, MONO } from "@/lib/theme";
 
 const PATH = [
   { id: "in", kind: "enroll" }, { id: "1", kind: "week" }, { id: "2", kind: "week" },
@@ -27,7 +21,7 @@ function destinationFor(p: ParticipantSelf): string {
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ marginTop: 30 }}>
-      <div style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: C.accentDeep, fontWeight: 600, marginBottom: 14, paddingBottom: 9, borderBottom: `1px solid ${C.line}` }}>
+      <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.14em", textTransform: "uppercase", color: C.accentDeep, fontWeight: 600, marginBottom: 14, paddingBottom: 9, borderBottom: `1px solid ${C.line}` }}>
         {label}
       </div>
       {children}
@@ -58,7 +52,7 @@ function Prereq({ title, summary, children, open, onToggle }: { title: string; s
 function ExtLink({ children }: { children: React.ReactNode }) {
   return (
     <a href="#" onClick={(e) => e.preventDefault()} className="a1c-link"
-       style={{ display: "inline-block", marginTop: 11, fontFamily: MONO, fontSize: 12.5, color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>
+       style={{ display: "inline-block", marginTop: 11, fontFamily: MONO, fontSize: 13.5, color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>
       {children} ↗
     </a>
   );
@@ -88,8 +82,8 @@ function Ethos({ head, children }: { head: string; children: React.ReactNode }) 
 function PathwayPreview() {
   return (
     <div style={{ overflowX: "auto" }}>
-      <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 9 }}>the four weeks</div>
-      <div style={{ display: "flex", alignItems: "center", fontFamily: MONO, fontSize: 12.5, whiteSpace: "nowrap" }}>
+      <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 9 }}>the four weeks</div>
+      <div style={{ display: "flex", alignItems: "center", fontFamily: MONO, fontSize: 13.5, whiteSpace: "nowrap" }}>
         {PATH.map((n, i) => {
           if (n.kind === "gap") return <span key={i} style={{ color: C.line, padding: "0 7px" }}>···</span>;
           const isMile = n.kind === "milestone";
@@ -105,7 +99,7 @@ function PathwayPreview() {
           );
         })}
       </div>
-      <div style={{ fontFamily: MONO, fontSize: 11.5, color: C.inkFaint, marginTop: 8 }}>◆ = an A1C reading · the rest are weekly check-ins</div>
+      <div style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint, marginTop: 8 }}>◆ = an A1C reading · the rest are weekly check-ins</div>
     </div>
   );
 }
@@ -165,22 +159,9 @@ export default function BeforeYouBeginPage() {
 
   return (
     <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
-        .a1c-root *:focus-visible { outline: 2px solid ${C.accent}; outline-offset: 2px; border-radius: 2px; }
-        .a1c-btn, .a1c-row { transition: background-color .12s ease, color .12s ease, border-color .12s ease, transform .07s ease; }
-        .a1c-primary:hover { background: ${C.accentDeep}; }
-        .a1c-link:hover { color: ${C.accentDeep}; }
-        .a1c-row:hover { border-color: ${C.accent}; }
-        .a1c-btn:active { transform: translateY(1px); }
-        .a1c-fade { animation: a1cFade .35s ease both; }
-        @media (prefers-reduced-motion: reduce){ .a1c-fade{ animation:none; } }
-        @keyframes a1cFade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-      `}</style>
-
-      <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+<div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
         <div style={{ maxWidth: 560, margin: "0 auto", padding: "26px 22px 28px" }}>
-          <div style={{ fontFamily: MONO, fontSize: 11.5, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
+          <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
             The A1C Challenge
           </div>
           <h1 style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 40, lineHeight: 1.08, letterSpacing: "-0.02em", margin: "14px 0 0" }}>
@@ -250,14 +231,14 @@ export default function BeforeYouBeginPage() {
                   Enroll now; start the weeks once you&rsquo;ve sourced everything.
                 </span>
                 <button className="a1c-link" onClick={() => setReconnect(true)}
-                        style={{ fontFamily: MONO, fontSize: 12.5, color: C.accentDeep, background: "none", border: "none", cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>
+                        style={{ fontFamily: MONO, fontSize: 13.5, color: C.accentDeep, background: "none", border: "none", cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>
                   I already have a code →
                 </button>
               </div>
             </>
           ) : (
             <div className="a1c-fade">
-              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 9 }}>Reconnect with your code</div>
+              <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.14em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 9 }}>Reconnect with your code</div>
               <div style={{ display: "flex", gap: 9 }}>
                 <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); setCodeError(""); }}
                        onKeyDown={(e) => e.key === "Enter" && handleReconnect()}

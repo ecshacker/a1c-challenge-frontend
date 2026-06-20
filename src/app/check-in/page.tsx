@@ -1,17 +1,10 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type ParticipantSelf } from "@/lib/api";
 import { getToken } from "@/lib/token";
-
-const C = {
-  pageBg: "#E6E5DD", card: "#F7F6F2", ink: "#222420", inkSoft: "#595C50",
-  inkFaint: "#8A8C80", line: "#D4D3C8", lineSoft: "#E0DFD6",
-  accent: "#586B4D", accentDeep: "#43543A", accentTint: "#EAEDE3",
-};
-const SERIF = "'Merriweather', Georgia, 'Times New Roman', serif";
-const MONO  = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+import { C, SERIF, MONO } from "@/lib/theme";
 const DAY_LETTERS = ["M", "T", "W", "T", "F", "S", "S"];
 
 const WELLBEING = [
@@ -97,7 +90,7 @@ function StartingNumbers({
         <div style={{ display: "flex", gap: 6, marginLeft: 120, marginBottom: 12 }}>
           {["Lab", "Home kit", "Clinic"].map((o) => (
             <button key={o} className={`a1c-opt ${fructHow === o ? "on" : ""}`} onClick={() => setFructHow(o)}
-                    style={{ fontFamily: MONO, fontSize: 12, padding: "6px 10px", cursor: "pointer", borderRadius: 4, background: fructHow === o ? C.accent : C.card, color: fructHow === o ? C.card : C.inkSoft, border: `1px solid ${fructHow === o ? C.accent : C.line}` }}>
+                    style={{ fontFamily: MONO, fontSize: 13, padding: "6px 10px", cursor: "pointer", borderRadius: 4, background: fructHow === o ? C.accent : C.card, color: fructHow === o ? C.card : C.inkSoft, border: `1px solid ${fructHow === o ? C.accent : C.line}` }}>
               {o}
             </button>
           ))}
@@ -147,7 +140,7 @@ function PathwayStrip({ current }: { current: string }) {
   ];
   return (
     <div style={{ marginTop: 12, overflowX: "auto" }}>
-      <div style={{ display: "flex", alignItems: "center", fontFamily: MONO, fontSize: 12.5, whiteSpace: "nowrap" }}>
+      <div style={{ display: "flex", alignItems: "center", fontFamily: MONO, fontSize: 13.5, whiteSpace: "nowrap" }}>
         {PATH.map((n, i) => {
           const isCurrent = n.id === current;
           const past = !isCurrent && (n.id === "e" || Number(n.id) < Number(current));
@@ -166,7 +159,7 @@ function PathwayStrip({ current }: { current: string }) {
           );
         })}
       </div>
-      <div style={{ fontFamily: MONO, fontSize: 11.5, color: C.inkFaint, marginTop: 7 }}>
+      <div style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint, marginTop: 7 }}>
         you are on week {current} · next milestone at week 4 (A1C)
       </div>
     </div>
@@ -179,7 +172,7 @@ function Tab({ id, active, onClick, sub, children }: { id: string; active: strin
     <button role="tab" aria-selected={on} className="a1c-tab" onClick={() => onClick(id)}
             style={{ flex: 1, textAlign: "left", cursor: "pointer", padding: "10px 11px", background: on ? C.card : "transparent", border: `1px solid ${on ? C.accent : C.line}`, borderRadius: 5, color: on ? C.ink : C.inkFaint }}>
       <div style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 700, lineHeight: 1.15 }}>{children}</div>
-      <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.06em", textTransform: "uppercase", color: on ? C.accentDeep : C.inkFaint, marginTop: 3 }}>{sub}</div>
+      <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.06em", textTransform: "uppercase", color: on ? C.accentDeep : C.inkFaint, marginTop: 3 }}>{sub}</div>
     </button>
   );
 }
@@ -213,11 +206,11 @@ function IntakeRow({ title, hint, days, onTap, had, not, unanswered, amount, set
         {had} had · {not} not{unanswered > 0 ? ` · ${unanswered} to answer` : ""}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 12 }}>
-        <span style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkSoft }}>about how much per day</span>
+        <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkSoft }}>about how much per day</span>
         <input inputMode="decimal" value={amount} onChange={(e) => setAmount(dec1(e.target.value))} placeholder="—"
                style={{ fontFamily: MONO, fontSize: 15, width: 60, padding: "8px 10px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
         <span style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint }}>g</span>
-        {echo && <span style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkFaint }}>{echo}</span>}
+        {echo && <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>{echo}</span>}
       </div>
     </div>
   );
@@ -228,7 +221,7 @@ function ScaleRow({ label, low, high, value, onPick }: { label: string; low: str
     <div style={{ marginBottom: 18 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <span style={{ fontFamily: SERIF, fontSize: 17.5, color: C.ink }}>{label}</span>
-        <span style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkFaint }}>{low} → {high}</span>
+        <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>{low} → {high}</span>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 7 }}>
         {[1, 2, 3, 4, 5].map((v) => {
@@ -270,7 +263,7 @@ function EducationPane() {
   return (
     <div style={{ borderTop: `1px solid ${C.line}`, background: C.card, flexShrink: 0 }}>
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "13px 22px 15px" }}>
-        <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 7 }}>Good to know</div>
+        <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.16em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 7 }}>Good to know</div>
         <div style={{ fontFamily: SERIF, fontSize: 15, lineHeight: 1.55, color: C.inkSoft }}>
           Hemp seed and raw flower are <strong style={{ color: C.ink, fontWeight: 700 }}>foods</strong> here — eaten as part of your day, raw, unless your clinician says otherwise. This sheet waits for you: open it whenever suits your week.
         </div>
@@ -310,7 +303,7 @@ function Popover({ children, onClose, side, title }: { children: React.ReactNode
       <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 40 }} />
       <div className="a1c-fade" role="dialog" aria-label={title}
            style={{ position: "absolute", top: 28, [side]: 0, zIndex: 41, width: 290, background: C.card, border: `1px solid ${C.line}`, borderRadius: 7, padding: "16px 17px", boxShadow: "0 10px 30px rgba(34,36,32,0.16)", fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.55, color: C.inkSoft }}>
-        <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 10 }}>{title}</div>
+        <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.14em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 10 }}>{title}</div>
         {children}
       </div>
     </>
@@ -571,21 +564,7 @@ export default function WeeklyCheckInPage() {
 
   return (
     <div className="a1c-root" style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
-        .a1c-root *:focus-visible { outline: 2px solid ${C.accent}; outline-offset: 2px; border-radius: 2px; }
-        .a1c-cell, .a1c-scale, .a1c-unit, .a1c-btn, .a1c-tab { transition: background-color .12s ease, color .12s ease, border-color .12s ease, transform .07s ease; }
-        .a1c-cell:hover, .a1c-scale:hover:not(.on) { border-color: ${C.accent}; }
-        .a1c-primary:hover { background: ${C.accentDeep}; }
-        .a1c-secondary:hover { border-color: ${C.accent}; color: ${C.ink}; }
-        .a1c-btn:active { transform: translateY(1px); }
-        .a1c-info:hover { color: ${C.accentDeep}; }
-        .a1c-fade { animation: a1cFade .35s ease both; }
-        @media (prefers-reduced-motion: reduce){ .a1c-fade{ animation:none; } }
-        @keyframes a1cFade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-      `}</style>
-
-      <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+<div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
         <div style={{ maxWidth: 560, margin: "0 auto", padding: "18px 22px 26px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, position: "relative" }}>
             <button className="a1c-info" onClick={() => setPopover(popover === "title" ? null : "title")} aria-expanded={popover === "title"}
@@ -642,7 +621,7 @@ export default function WeeklyCheckInPage() {
           ) : tab === "objective" ? (
             <div role="tabpanel" className="a1c-fade">
               <p style={prose}>Mark each day you had it, eaten as food.</p>
-              <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, margin: "-10px 0 22px" }}>
+              <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, margin: "-10px 0 22px" }}>
                 tap a day to cycle · <span style={{ color: C.accentDeep }}>had it</span> → <span style={{ textDecoration: "line-through" }}>didn&rsquo;t</span> → clear
               </div>
               <IntakeRow title="Hemp seed" hint={self ? `your amount · ${self.baselineA1c ? "" : ""}` : ""} days={hemp} onTap={(i) => tapDay(hemp, setHemp, i)} had={had(hemp)} not={not(hemp)} unanswered={7 - hempAnswered}
@@ -650,7 +629,7 @@ export default function WeeklyCheckInPage() {
               <IntakeRow title="Raw cannabis flower" hint="aim · at least 1 g/day, raw" days={cannabis} onTap={(i) => tapDay(cannabis, setCannabis, i)} had={had(cannabis)} not={not(cannabis)} unanswered={7 - cannAnswered}
                          amount={cannAmt} setAmount={setCannAmt} />
               <div style={{ height: 1, background: C.lineSoft, margin: "24px 0 16px" }} />
-              <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 13 }}>Measures about you</div>
+              <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 13 }}>Measures about you</div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <label style={{ fontFamily: MONO, fontSize: 14.5, color: C.inkSoft, width: 96 }}>Your weight</label>
                 <input inputMode="decimal" value={weight} onChange={(e) => setWeight(dec1(e.target.value))} placeholder="—"
@@ -663,7 +642,7 @@ export default function WeeklyCheckInPage() {
                     </button>
                   ))}
                 </div>
-                <span style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkFaint }}>optional</span>
+                <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>optional</span>
               </div>
             </div>
           ) : (
@@ -715,7 +694,7 @@ export default function WeeklyCheckInPage() {
 
       {confirmStep === "ask" && (
         <Modal>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep }}>Before you finish</div>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep }}>Before you finish</div>
           <div style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 700, color: C.ink, margin: "10px 0 12px", lineHeight: 1.3 }}>Finish week {studyWeek}?</div>
           <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: 0 }}>
             You filled in {wbDone} of the six reads on <em>This week</em>. Blank is a fine answer — fill the rest only if something comes to mind.
@@ -729,7 +708,7 @@ export default function WeeklyCheckInPage() {
 
       {done && (
         <Modal onClose={() => setDone(false)}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep }}>Week complete</div>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep }}>Week complete</div>
           <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 32, color: C.ink, margin: "10px 0 18px", letterSpacing: "-0.01em" }}>Week {studyWeek} is in</div>
           <div style={{ display: "grid", gap: 9, fontFamily: MONO, fontSize: 14, color: C.inkSoft }}>
             <Line k="days had" v={`${had(hemp) + had(cannabis)}`} />

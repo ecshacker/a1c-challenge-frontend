@@ -1,4 +1,4 @@
-"use client"; // Required at the very top since your views track local states via hooks
+﻿"use client"; // Required at the very top since your views track local states via hooks
 
 import React, { useState, useEffect } from "react";
 
@@ -19,22 +19,9 @@ import React, { useState, useEffect } from "react";
  *    sanitizing the localized stats will need.
  */
 
-const C = {
-  pageBg: "#E6E5DD",
-  card: "#F7F6F2",
-  ink: "#222420",
-  inkSoft: "#595C50",
-  inkFaint: "#8A8C80",
-  line: "#D4D3C8",
-  lineSoft: "#E0DFD6",
-  accent: "#586B4D",
-  accentDeep: "#43543A",
-  accentTint: "#EAEDE3",
-  clay: "#9A5A3C",
-  clayTint: "#EFE6DF",
-};
-const SERIF = "'Merriweather', Georgia, 'Times New Roman', serif";
-const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+import { C, SERIF, MONO } from "@/lib/theme";
+
+const clay = "#9A5A3C", clayTint = "#EFE6DF";
 
 function Sect({ n, title, summary, children, open, onToggle }) {
   return (
@@ -56,7 +43,7 @@ function Sect({ n, title, summary, children, open, onToggle }) {
 function Look({ points }) {
   return (
     <div style={{ marginBottom: 4 }}>
-      <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 9 }}>What to look for</div>
+      <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 9 }}>What to look for</div>
       {points.map((p, i) => (
         <div key={i} style={{ display: "flex", gap: 9, marginBottom: 10 }}>
           <span style={{ color: C.accent, fontFamily: MONO, fontSize: 14, lineHeight: 1.5 }}>·</span>
@@ -70,18 +57,18 @@ function Look({ points }) {
 function Where({ children }) {
   return (
     <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.lineSoft}` }}>
-      <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 7 }}>Where to find it</div>
+      <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 7 }}>Where to find it</div>
       <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: C.inkSoft, margin: 0 }}>{children}</p>
     </div>
   );
 }
 
 function Caveat({ children, tone }) {
-  const col = tone === "legal" ? C.clay : C.accentDeep;
-  const bg = tone === "legal" ? C.clayTint : C.accentTint;
+  const col = tone === "legal" ? clay : C.accentDeep;
+  const bg = tone === "legal" ? clayTint : C.accentTint;
   return (
     <div style={{ margin: "14px 0", padding: "12px 14px", background: bg, border: `1px solid ${col}`, borderRadius: 6 }}>
-      <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: col, marginBottom: 6 }}>{tone === "legal" ? "On legality" : "On testing"}</div>
+      <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.12em", textTransform: "uppercase", color: col, marginBottom: 6 }}>{tone === "legal" ? "On legality" : "On testing"}</div>
       <p style={{ fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.55, color: C.inkSoft, margin: 0 }}>{children}</p>
     </div>
   );
@@ -106,21 +93,7 @@ export default function GettingSetUpPage() {
         color: C.ink,
         overflow: "hidden"
       }} className="a1c-root">
-        <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
-        .a1c-root *:focus-visible { outline: 2px solid ${C.accent}; outline-offset: 2px; border-radius: 2px; }
-        .a1c-btn,.a1c-row,.a1c-loc { transition: background-color .12s, color .12s, border-color .12s, transform .07s; }
-        .a1c-primary:hover { background: ${C.accentDeep}; }
-        .a1c-link:hover { color: ${C.accentDeep}; }
-        .a1c-row:hover { border-color: ${C.accent}; }
-        .a1c-loc:hover { border-color: ${C.accent}; }
-        .a1c-btn:active { transform: translateY(1px); }
-        .a1c-fade { animation: a1cFade .3s ease both; }
-        @media (prefers-reduced-motion: reduce){ .a1c-fade{ animation:none; } }
-        @keyframes a1cFade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-      `}</style>
-
-        <div style={{flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch"}}>
+<div style={{flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch"}}>
           <div style={{maxWidth: 560, margin: "0 auto", padding: "24px 22px 28px"}}>
           <span style={{
             fontFamily: MONO,

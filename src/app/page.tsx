@@ -1,34 +1,13 @@
-import Link from "next/link";
-
-const C = {
-  pageBg:    "#E6E5DD",
-  card:      "#F7F6F2",
-  ink:       "#222420",
-  inkSoft:   "#595C50",
-  inkFaint:  "#8A8C80",
-  line:      "#D4D3C8",
-  accent:    "#586B4D",
-  accentDeep:"#43543A",
-  accentTint:"#EAEDE3",
-};
-const SERIF = "'Merriweather', Georgia, 'Times New Roman', serif";
-const MONO  = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+﻿import Link from "next/link";
+import { C, SERIF, MONO } from "@/lib/theme";
 
 export default function LandingPage() {
   return (
     <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
-        *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; }
-        a.a1c-link { color: ${C.accentDeep}; text-decoration: underline; text-underline-offset: 3px; }
-        a.a1c-link:hover { color: ${C.accent}; }
-      `}</style>
-
-      {/* Hero */}
+{/* Hero */}
       <div style={{ borderBottom: `1px solid ${C.line}`, background: C.card }}>
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "48px 24px 44px" }}>
-          <div style={{ fontFamily: MONO, fontSize: 11.5, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft, marginBottom: 18 }}>
+          <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft, marginBottom: 18 }}>
             The A1C Challenge
           </div>
           <h1 style={{ fontFamily: SERIF, fontWeight: 800, fontSize: "clamp(34px, 6vw, 52px)", lineHeight: 1.07, letterSpacing: "-0.02em", margin: "0 0 22px", color: C.ink }}>
@@ -54,7 +33,7 @@ export default function LandingPage() {
 
         {/* The hypothesis */}
         <div style={{ marginTop: 44, padding: "26px 28px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 14 }}>The hypothesis</div>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 14 }}>The hypothesis</div>
           <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 16px" }}>
             If a faster biomarker moves ahead of a slower one, that ordering is consistent with an upstream correction rather than downstream glucose suppression. It doesn&rsquo;t rule out other explanations.
           </p>
@@ -68,7 +47,7 @@ export default function LandingPage() {
 
         {/* How it works */}
         <div style={{ marginTop: 44 }}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 20, paddingBottom: 10, borderBottom: `1px solid ${C.line}` }}>How it works</div>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 20, paddingBottom: 10, borderBottom: `1px solid ${C.line}` }}>How it works</div>
           {[
             { n: "1", head: "Enroll and set a baseline", body: "Any day works. You give a starting A1C and a few details — no name, no email. You get a code; that's your whole identity here." },
             { n: "2", head: "Start on a Monday", body: "Once you've sourced the food, pick a Monday to begin. Your weeks run Monday to Sunday from there, so nothing is half a week." },
@@ -87,7 +66,7 @@ export default function LandingPage() {
 
         {/* Open science */}
         <div style={{ marginTop: 44, padding: "26px 28px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 8 }}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 14 }}>Open science</div>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 14 }}>Open science</div>
           <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 14px" }}>
             This app is open-source and feeds an append-only{" "}
             <a className="a1c-link" href="https://zenodo.org/records/20653093" target="_blank" rel="noopener noreferrer">Zenodo dataset</a>.
@@ -107,7 +86,7 @@ export default function LandingPage() {
 
         {/* What you need */}
         <div style={{ marginTop: 44 }}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 20, paddingBottom: 10, borderBottom: `1px solid ${C.line}` }}>What you&rsquo;ll need</div>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 20, paddingBottom: 10, borderBottom: `1px solid ${C.line}` }}>What you&rsquo;ll need</div>
           {[
             { head: "The food", body: "Hemp seed (whole or shelled, raw, kept cold) and raw cannabis flower — flower that has never been heated or decarboxylated. Heat changes it from the food we're looking at into something else." },
             { head: "A way to measure", body: "An A1C reading at the start and again at week 4. A home kit, a pharmacy, or a clinic — whatever you can reach. Fructosamine is optional but valuable if you have access." },
@@ -134,16 +113,16 @@ export default function LandingPage() {
 
         {/* Footer */}
         <div style={{ marginTop: 48, paddingTop: 24, borderTop: `1px solid ${C.line}`, display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "space-between", alignItems: "baseline" }}>
-          <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint }}>
+          <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint }}>
             The A1C Challenge · a1c-challenge.org
           </div>
           <div style={{ display: "flex", gap: 18 }}>
             <a className="a1c-link" href="https://osf.io/r4ufg/overview" target="_blank" rel="noopener noreferrer"
-               style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, textDecoration: "none" }}>
+               style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, textDecoration: "none" }}>
               Study spec (OSF)
             </a>
             <a className="a1c-link" href="https://zenodo.org/records/20653093" target="_blank" rel="noopener noreferrer"
-               style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, textDecoration: "none" }}>
+               style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, textDecoration: "none" }}>
               Dataset (Zenodo)
             </a>
           </div>

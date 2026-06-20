@@ -1,17 +1,12 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
 import { setPendingToken, persistToken } from "@/lib/token";
+import { C, SERIF, MONO } from "@/lib/theme";
 
-const C = {
-  pageBg: "#E6E5DD", card: "#F7F6F2", ink: "#222420", inkSoft: "#595C50",
-  inkFaint: "#8A8C80", line: "#D4D3C8", lineSoft: "#E0DFD6",
-  accent: "#586B4D", accentDeep: "#43543A", accentTint: "#EAEDE3", warn: "#9A5A3C",
-};
-const SERIF = "'Merriweather', Georgia, 'Times New Roman', serif";
-const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+const warn = "#9A5A3C";
 
 const WELLBEING = [
   { id: "energy",   label: "Energy",    low: "low",     high: "high"    },
@@ -102,7 +97,7 @@ function TokenReveal({ token, saved, setSaved, onCopy, onContinue }: {
 }) {
   return (
     <div className="a1c-fade" style={{ padding: "34px 22px 28px", minHeight: "100%", display: "flex", flexDirection: "column" }}>
-      <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accentDeep }}>You&rsquo;re in</div>
+      <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accentDeep }}>You&rsquo;re in</div>
       <h1 style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 30, letterSpacing: "-0.01em", margin: "12px 0 6px" }}>This is your code</h1>
       <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 22px" }}>
         Write it down now — somewhere you&rsquo;ll still find it in four weeks.
@@ -176,7 +171,7 @@ function Scale({ label, low, high, value, onPick }: { label: string; low: string
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <span style={{ fontFamily: SERIF, fontSize: 17, color: C.ink }}>{label}</span>
-        <span style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkFaint }}>{low} → {high}</span>
+        <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>{low} → {high}</span>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 7 }}>
         {[1, 2, 3, 4, 5].map((n) => {
@@ -198,7 +193,7 @@ function Field({ label, optional, children }: { label: string; optional?: boolea
     <div style={{ marginBottom: 22 }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
         <span style={{ fontFamily: SERIF, fontSize: 16.5, fontWeight: 700, color: C.ink }}>{label}</span>
-        {optional && <span style={{ fontFamily: MONO, fontSize: 11.5, color: C.inkFaint, textTransform: "uppercase", letterSpacing: "0.1em" }}>optional</span>}
+        {optional && <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint, textTransform: "uppercase", letterSpacing: "0.1em" }}>optional</span>}
       </div>
       {children}
     </div>
@@ -218,11 +213,11 @@ function AgeContext({ ctx, onDismiss }: { ctx: { pct: string; group: string; not
     <div ref={ref} className="a1c-fade" style={{ marginTop: 12, padding: "14px 16px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 7, position: "relative" }}>
       <button onClick={onDismiss} aria-label="Dismiss"
               style={{ position: "absolute", top: 10, right: 12, fontFamily: MONO, fontSize: 16, lineHeight: 1, color: C.inkFaint, background: "none", border: "none", cursor: "pointer", padding: "2px 4px" }}>×</button>
-      <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 7 }}>You&rsquo;re not alone in this</div>
+      <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 7 }}>You&rsquo;re not alone in this</div>
       <div style={{ fontFamily: SERIF, fontSize: 15, lineHeight: 1.6, color: C.inkSoft }}>
         <strong style={{ color: C.ink, fontWeight: 700 }}>{ctx.pct} of {ctx.group}</strong> are in the prediabetes range too — so you&rsquo;re far from the only one your age watching these numbers. {ctx.note}
       </div>
-      <div style={{ fontFamily: MONO, fontSize: 11, color: C.inkFaint, marginTop: 9 }}>Source · CDC National Diabetes Statistics Report</div>
+      <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, marginTop: 9 }}>Source · CDC National Diabetes Statistics Report</div>
     </div>
   );
 }
@@ -236,7 +231,7 @@ function Care({ children, tone }: { children: React.ReactNode; tone?: string }) 
 }
 
 function Note({ children, tone }: { children: React.ReactNode; tone?: string }) {
-  return <div style={{ fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.5, color: tone === "warn" ? C.warn : C.inkFaint, marginTop: 9 }}>{children}</div>;
+  return <div style={{ fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.5, color: tone === "warn" ? warn : C.inkFaint, marginTop: 9 }}>{children}</div>;
 }
 
 const lead: React.CSSProperties = { fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 24px" };
@@ -362,28 +357,14 @@ export default function EnrollmentIntakePage() {
 
   return (
     <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
-        .a1c-root *:focus-visible { outline: 2px solid ${C.accent}; outline-offset: 2px; border-radius: 2px; }
-        .a1c-btn,.a1c-opt,.a1c-scale { transition: background-color .12s, color .12s, border-color .12s, transform .07s; }
-        .a1c-primary:enabled:hover { background: ${C.accentDeep}; }
-        .a1c-opt:hover:not(.on),.a1c-scale:hover:not(.on) { border-color: ${C.accent}; }
-        .a1c-ghost:hover { color: ${C.ink}; }
-        .a1c-btn:active { transform: translateY(1px); }
-        .a1c-fade { animation: a1cFade .35s ease both; }
-        @media (prefers-reduced-motion: reduce){ .a1c-fade{ animation:none; } }
-        @keyframes a1cFade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-        select,input { font-family: ${MONO}; }
-      `}</style>
-
-      {step < 4 && (
+{step < 4 && (
         <div style={{ flexShrink: 0, borderBottom: `1px solid ${C.line}`, background: C.pageBg }}>
           <div style={{ maxWidth: 560, margin: "0 auto", padding: "20px 22px 16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
+              <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
                 Enrol · The A1C Challenge
               </span>
-              <span style={{ fontFamily: MONO, fontSize: 11.5, color: C.inkFaint }}>step {step + 1} of 4</span>
+              <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>step {step + 1} of 4</span>
             </div>
             <div style={{ display: "flex", gap: 5, marginTop: 12 }}>
               {STEPS.map((_, i) => (
@@ -540,7 +521,7 @@ export default function EnrollmentIntakePage() {
               </Field>
 
               {enrollError && (
-                <div style={{ padding: "13px 15px", background: "#FEF2EE", border: `1px solid ${C.warn}`, borderRadius: 6, fontFamily: SERIF, fontSize: 14.5, color: C.warn, marginTop: 8 }}>
+                <div style={{ padding: "13px 15px", background: "#FEF2EE", border: `1px solid ${warn}`, borderRadius: 6, fontFamily: SERIF, fontSize: 14.5, color: warn, marginTop: 8 }}>
                   {enrollError}
                 </div>
               )}

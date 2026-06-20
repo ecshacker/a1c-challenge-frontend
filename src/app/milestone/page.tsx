@@ -1,25 +1,19 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { api, ApiError, type ParticipantSelf } from "@/lib/api";
+import { C, SERIF, MONO } from "@/lib/theme";
 
-const C = {
-  pageBg: "#E6E5DD", card: "#F7F6F2", ink: "#222420", inkSoft: "#595C50",
-  inkFaint: "#8A8C80", line: "#D4D3C8", lineSoft: "#E0DFD6",
-  accent: "#586B4D", accentDeep: "#43543A", accentTint: "#EAEDE3",
-  clay: "#9A5A3C", clayTint: "#EFE6DF", zoneMid: "#DAD8C8", zoneHi: "#C9C6B4",
-};
-const SERIF = "'Merriweather', Georgia, 'Times New Roman', serif";
-const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+const clay = "#9A5A3C", clayTint = "#EFE6DF", zoneMid = "#DAD8C8", zoneHi = "#C9C6B4";
 
 const A1C_ZONES = [
   { from: 5.0, to: 5.7, bg: C.accentTint, label: "normal" },
-  { from: 5.7, to: 6.5, bg: C.zoneMid, label: "prediabetes" },
-  { from: 6.5, to: 8.0, bg: C.zoneHi, label: "diabetes" },
+  { from: 5.7, to: 6.5, bg: zoneMid, label: "prediabetes" },
+  { from: 6.5, to: 8.0, bg: zoneHi, label: "diabetes" },
 ];
 const FRUCT_ZONES = [
   { from: 180, to: 285, bg: C.accentTint, label: "typical · ~200–285" },
-  { from: 285, to: 360, bg: C.zoneMid, label: "elevated" },
+  { from: 285, to: 360, bg: zoneMid, label: "elevated" },
 ];
 const WELLBEING = [
   { id: "energy",    label: "Energy",    low: "low",     high: "high"    },
@@ -67,8 +61,8 @@ function Compare({ label, base, now, fmt, suffix, goodDir, eps, last, noLabel }:
   const d = now - base;
   const moved = Math.abs(d) > eps;
   const improving = goodDir === "down" ? d < 0 : goodDir === "up" ? d > 0 : null;
-  const color = !moved || goodDir === "none" ? C.inkFaint : improving ? C.accentDeep : C.clay;
-  const bg    = !moved || goodDir === "none" ? C.lineSoft  : improving ? C.accentTint : C.clayTint;
+  const color = !moved || goodDir === "none" ? C.inkFaint : improving ? C.accentDeep : clay;
+  const bg    = !moved || goodDir === "none" ? C.lineSoft  : improving ? C.accentTint : clayTint;
   const arrow = !moved ? "—" : d < 0 ? "↓" : "↑";
   const mag   = suffix === "µmol/L" ? `${Math.round(Math.abs(d))}` : Math.abs(d).toFixed(1);
   return (
@@ -82,7 +76,7 @@ function Compare({ label, base, now, fmt, suffix, goodDir, eps, last, noLabel }:
           {arrow} {moved ? mag : "0"}
         </span>
       </div>
-      <div style={{ display: "flex", gap: 70, marginTop: 4, fontFamily: MONO, fontSize: 11.5, color: C.inkFaint }}>
+      <div style={{ display: "flex", gap: 70, marginTop: 4, fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>
         <span>baseline</span><span>now</span>
       </div>
     </div>
@@ -93,7 +87,7 @@ function BigMarker({ at, faded, label }: { at: number; faded?: boolean; label: s
   return (
     <div style={{ position: "absolute", top: 4, left: `${at}%`, transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <div style={{ width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: `11px solid ${faded ? C.inkFaint : C.accentDeep}` }} />
-      <span style={{ fontFamily: MONO, fontSize: 12, color: faded ? C.inkFaint : C.accentDeep, marginTop: 3, fontWeight: faded ? 400 : 700 }}>{label}</span>
+      <span style={{ fontFamily: MONO, fontSize: 13, color: faded ? C.inkFaint : C.accentDeep, marginTop: 3, fontWeight: faded ? 400 : 700 }}>{label}</span>
     </div>
   );
 }
@@ -109,7 +103,7 @@ function Band({ lo, hi, zones, base, now }: { lo: number; hi: number; zones: { f
         <BigMarker at={pos(base)} faded label="was" />
         <BigMarker at={pos(now)} label="now" />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontFamily: MONO, fontSize: 11, color: C.inkFaint, marginTop: -6 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontFamily: MONO, fontSize: 13, color: C.inkFaint, marginTop: -6 }}>
         {zones.map((z, i) => <span key={i}>{z.label}</span>)}
       </div>
     </div>
@@ -121,7 +115,7 @@ function ScaleRow({ label, low, high, value, onPick }: { label: string; low: str
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
         <span style={{ fontFamily: SERIF, fontSize: 17, color: C.ink }}>{label}</span>
-        <span style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint }}>{low} → {high}</span>
+        <span style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint }}>{low} → {high}</span>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }}>
         {[1, 2, 3, 4, 5].map((v) => {
@@ -141,7 +135,7 @@ function ScaleRow({ label, low, high, value, onPick }: { label: string; low: str
 function PickRow({ label, value, set, opts }: { label: string; value: string; set: (v: string) => void; opts: string[] }) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <div style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkSoft, marginBottom: 7 }}>{label}</div>
+      <div style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkSoft, marginBottom: 7 }}>{label}</div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {opts.map((o) => {
           const on = value === o;
@@ -269,26 +263,14 @@ export default function MilestonePage() {
     const wbAvgNow  = wbNow.length ? wbNow.reduce((a, b) => a + b, 0) / wbNow.length : null;
     const badge     = a1cBadge(baseA1c, nowA1c);
     const bs = badge.tone === "good" ? { bg: C.accentTint, bd: C.accent, mark: C.accentDeep }
-             : badge.tone === "soft" ? { bg: C.clayTint, bd: C.clay, mark: C.clay }
+             : badge.tone === "soft" ? { bg: clayTint, bd: clay, mark: clay }
              : { bg: C.card, bd: C.line, mark: C.inkFaint };
 
     return (
       <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
-          .a1c-root *:focus-visible { outline: 2px solid ${C.accent}; outline-offset: 2px; border-radius: 2px; }
-          .a1c-btn { transition: background-color .12s, color .12s, border-color .12s, transform .07s; }
-          .a1c-primary:hover { background: ${C.accentDeep}; }
-          .a1c-secondary:hover { border-color: ${C.accent}; color: ${C.ink}; }
-          .a1c-btn:active { transform: translateY(1px); }
-          .a1c-fade { animation: a1cFade .4s ease both; }
-          @media (prefers-reduced-motion: reduce){ .a1c-fade{ animation:none; } }
-          @keyframes a1cFade { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
-        `}</style>
-
-        <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+<div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
           <div style={{ maxWidth: 560, margin: "0 auto", padding: "24px 22px 28px" }}>
-            <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accentDeep }}>Week {studyWeek} · milestone</div>
+            <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accentDeep }}>Week {studyWeek} · milestone</div>
             <h1 style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 38, lineHeight: 1.08, letterSpacing: "-0.02em", margin: "12px 0 0" }}>
               Your {studyWeek <= 4 ? "four" : "eight"}-week mark
             </h1>
@@ -304,7 +286,7 @@ export default function MilestonePage() {
                 <>
                   <div style={{ marginTop: 26, display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
                     <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.06em", textTransform: "uppercase", color: C.inkSoft }}>Fructosamine</span>
-                    <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.04em", textTransform: "uppercase", color: C.accentDeep, background: C.accentTint, borderRadius: 20, padding: "3px 10px" }}>the faster-moving marker</span>
+                    <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase", color: C.accentDeep, background: C.accentTint, borderRadius: 20, padding: "3px 10px" }}>the faster-moving marker</span>
                   </div>
                   <Compare base={baseFruct} now={nowFruct} fmt={(v) => `${Math.round(v)}`} suffix="µmol/L" goodDir="down" eps={2} noLabel />
                   <Band lo={180} hi={360} zones={FRUCT_ZONES} base={baseFruct} now={nowFruct} />
@@ -325,16 +307,16 @@ export default function MilestonePage() {
 
             {wbAvgNow !== null && (
               <div className="a1c-fade" style={{ marginTop: 22 }}>
-                <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 11 }}>How you felt</div>
+                <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 11 }}>How you felt</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
                   {WELLBEING.map(({ id, label }) => {
                     const wbKey = id === "comfort" ? "wbPain" : `wb${label}`;
                     const v = result[wbKey] as number | null;
                     return (
                       <div key={id} style={{ padding: "10px 12px", background: C.card, border: `1px solid ${C.lineSoft}`, borderRadius: 5 }}>
-                        <div style={{ fontFamily: MONO, fontSize: 11, color: C.inkFaint, marginBottom: 5 }}>{label}</div>
+                        <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, marginBottom: 5 }}>{label}</div>
                         <div style={{ fontFamily: MONO, fontSize: 26, color: v != null ? C.ink : C.inkFaint }}>{v ?? "—"}</div>
-                        <div style={{ fontFamily: MONO, fontSize: 10, color: C.inkFaint }}>of 5</div>
+                        <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint }}>of 5</div>
                       </div>
                     );
                   })}
@@ -343,7 +325,7 @@ export default function MilestonePage() {
             )}
 
             <div style={{ marginTop: 24, padding: "15px 17px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
-              <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 8 }}>What this is</div>
+              <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 8 }}>What this is</div>
               <p style={{ fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.6, color: C.inkSoft, margin: 0 }}>
                 These are your own numbers, measured twice. Whether the food is <em>why</em> they moved is the question everyone&rsquo;s data answers together — one person&rsquo;s change, in any direction, isn&rsquo;t proof on its own.
               </p>
@@ -376,7 +358,7 @@ export default function MilestonePage() {
         </div>
 
         {toast && (
-          <div className="a1c-fade" style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", bottom: 92, background: C.ink, color: C.card, fontFamily: MONO, fontSize: 12.5, padding: "10px 16px", borderRadius: 6, zIndex: 60, maxWidth: 340, textAlign: "center" }}>{toast}</div>
+          <div className="a1c-fade" style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", bottom: 92, background: C.ink, color: C.card, fontFamily: MONO, fontSize: 13.5, padding: "10px 16px", borderRadius: 6, zIndex: 60, maxWidth: 340, textAlign: "center" }}>{toast}</div>
         )}
       </div>
     );
@@ -385,20 +367,9 @@ export default function MilestonePage() {
   // ---- entry form ----
   return (
     <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
-        .a1c-root *:focus-visible { outline: 2px solid ${C.accent}; outline-offset: 2px; border-radius: 2px; }
-        .a1c-btn { transition: background-color .12s, color .12s, border-color .12s, transform .07s; }
-        .a1c-primary:hover { background: ${C.accentDeep}; }
-        .a1c-btn:active { transform: translateY(1px); }
-        .a1c-fade { animation: a1cFade .35s ease both; }
-        @media (prefers-reduced-motion: reduce){ .a1c-fade{ animation:none; } }
-        @keyframes a1cFade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-      `}</style>
-
-      <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+<div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
         <div style={{ maxWidth: 560, margin: "0 auto", padding: "24px 22px 28px" }}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accentDeep }}>Week {studyWeek} · milestone</div>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accentDeep }}>Week {studyWeek} · milestone</div>
           <h1 style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 36, lineHeight: 1.08, letterSpacing: "-0.02em", margin: "10px 0 0" }}>
             Your {studyWeek <= 4 ? "four" : "eight"}-week reading
           </h1>
@@ -408,11 +379,11 @@ export default function MilestonePage() {
 
           <div style={{ height: 1, background: C.line, margin: "20px 0 22px" }} />
 
-          <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 16 }}>New test results</div>
+          <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 16 }}>New test results</div>
 
           {/* A1C */}
           <div style={{ marginBottom: 22 }}>
-            <div style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 700, color: C.ink, marginBottom: 9 }}>A1C <span style={{ fontFamily: MONO, fontSize: 13, fontWeight: 400, color: C.clay }}>required</span></div>
+            <div style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 700, color: C.ink, marginBottom: 9 }}>A1C <span style={{ fontFamily: MONO, fontSize: 13, fontWeight: 400, color: clay }}>required</span></div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 9 }}>
               <input inputMode="decimal" value={a1c} onChange={(e) => setA1c(dec1(e.target.value))} placeholder=""
                      style={{ fontFamily: MONO, fontSize: 16, width: 80, padding: "9px 11px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 5, color: C.ink }} />
@@ -437,7 +408,7 @@ export default function MilestonePage() {
           </div>
 
           <div style={{ height: 1, background: C.lineSoft, margin: "4px 0 22px" }} />
-          <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 16 }}>How you felt overall</div>
+          <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 16 }}>How you felt overall</div>
           <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 18px" }}>One to five, looking back over the whole stretch.</p>
 
           {WELLBEING.map(({ id, ...rest }) => (
@@ -445,12 +416,12 @@ export default function MilestonePage() {
           ))}
 
           <div style={{ height: 1, background: C.lineSoft, margin: "18px 0 22px" }} />
-          <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 16 }}>A couple of questions</div>
+          <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 16 }}>A couple of questions</div>
 
           <PickRow label="Any medication or supplement changes over this stretch?" value={medChange} set={setMedChange} opts={["No", "Yes", "Not sure"]} />
 
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkSoft, marginBottom: 8 }}>
+            <div style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkSoft, marginBottom: 8 }}>
               About what share of days would you say you had the hemp or cannabis as food?
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -462,14 +433,14 @@ export default function MilestonePage() {
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkSoft, marginBottom: 8 }}>What are you thinking about doing next?</div>
+            <div style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkSoft, marginBottom: 8 }}>What are you thinking about doing next?</div>
             <textarea value={whatNext} onChange={(e) => setWhatNext(e.target.value)} rows={2}
                       placeholder="Keep going, try something different, nothing yet — whatever comes to mind."
                       style={{ width: "100%", boxSizing: "border-box", fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, padding: "12px 14px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 5, color: C.ink, resize: "vertical" }} />
           </div>
 
           <div style={{ marginBottom: 8 }}>
-            <div style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkSoft, marginBottom: 8 }}>Anything else you want to record</div>
+            <div style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkSoft, marginBottom: 8 }}>Anything else you want to record</div>
             <textarea value={noteText} onChange={(e) => setNoteText(e.target.value)} rows={3}
                       placeholder="A change you noticed, something that surprised you, a question for yourself later…"
                       style={{ width: "100%", boxSizing: "border-box", fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, padding: "12px 14px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 5, color: C.ink, resize: "vertical" }} />
@@ -482,7 +453,7 @@ export default function MilestonePage() {
           )}
 
           {!canSubmit && (a1c || a1cHow) && (
-            <div style={{ fontFamily: SERIF, fontSize: 14, color: C.clay, marginTop: 12 }}>
+            <div style={{ fontFamily: SERIF, fontSize: 14, color: clay, marginTop: 12 }}>
               {!a1c ? "Enter your A1C value." : !a1cHow ? "Select how A1C was measured." : fruct && !fructHow ? "Select how fructosamine was measured." : ""}
             </div>
           )}

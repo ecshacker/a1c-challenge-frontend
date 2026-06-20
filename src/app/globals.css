@@ -1,18 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --font-serif: 'Merriweather', Georgia, serif;
+  --a1c-page-bg:     #E6E5DD;
+  --a1c-card:        #F7F6F2;
+  --a1c-ink:         #222420;
+  --a1c-ink-soft:    #595C50;
+  --a1c-ink-faint:   #8A8C80;
+  --a1c-line:        #D4D3C8;
+  --a1c-accent:      #586B4D;
+  --a1c-accent-deep: #43543A;
+  --a1c-accent-tint: #EAEDE3;
 }
 
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
-  color: #222420;
-  font-family: var(--font-serif);
+  margin: 0;
+  color: var(--a1c-ink);
+  background: var(--a1c-page-bg);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Helper for smooth state transitions in your views */
+/* Focus ring — consistent across all views */
+.a1c-root *:focus-visible {
+  outline: 2px solid var(--a1c-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Entrance animation */
 .a1c-fade {
-  transition: all 0.2s ease-in-out;
+  animation: a1cFade 0.35s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .a1c-fade { animation: none; }
+}
+@keyframes a1cFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Shared transitions */
+.a1c-cell,
+.a1c-scale,
+.a1c-unit,
+.a1c-btn,
+.a1c-tab,
+.a1c-btn,
+.a1c-row {
+  transition: background-color 0.12s ease, color 0.12s ease,
+              border-color 0.12s ease, transform 0.07s ease;
+}
+
+.a1c-cell:hover,
+.a1c-scale:hover:not(.on) { border-color: var(--a1c-accent); }
+
+.a1c-primary:hover  { background: var(--a1c-accent-deep); }
+.a1c-secondary:hover { border-color: var(--a1c-accent); color: var(--a1c-ink); }
+.a1c-info:hover     { color: var(--a1c-accent-deep); }
+.a1c-link:hover     { color: var(--a1c-accent-deep); }
+.a1c-row:hover      { border-color: var(--a1c-accent); }
+
+.a1c-btn:active { transform: translateY(1px); }
+
+/* Shared link style used on landing page */
+a.a1c-link {
+  color: var(--a1c-accent-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

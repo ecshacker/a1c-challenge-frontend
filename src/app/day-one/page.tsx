@@ -1,16 +1,9 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type ParticipantSelf } from "@/lib/api";
-
-const C = {
-  pageBg: "#E6E5DD", card: "#F7F6F2", ink: "#222420", inkSoft: "#595C50",
-  inkFaint: "#8A8C80", line: "#D4D3C8", lineSoft: "#E0DFD6",
-  accent: "#586B4D", accentDeep: "#43543A", accentTint: "#EAEDE3",
-};
-const SERIF = "'Merriweather', Georgia, 'Times New Roman', serif";
-const MONO  = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+import { C, SERIF, MONO } from "@/lib/theme";
 
 function upcomingMondays() {
   const today = new Date();
@@ -43,7 +36,7 @@ const PATH = [
 function PathwayPreview() {
   return (
     <div style={{ marginTop: 16, overflowX: "auto" }}>
-      <div style={{ display: "flex", alignItems: "center", fontFamily: MONO, fontSize: 12.5, whiteSpace: "nowrap" }}>
+      <div style={{ display: "flex", alignItems: "center", fontFamily: MONO, fontSize: 13.5, whiteSpace: "nowrap" }}>
         {PATH.map((n, i) => {
           if (n.kind === "gap") return <span key={i} style={{ color: C.line, padding: "0 7px" }}>···</span>;
           const isMile = n.kind === "milestone";
@@ -60,14 +53,14 @@ function PathwayPreview() {
             </React.Fragment>
           );
         })}
-        <span style={{ fontFamily: MONO, fontSize: 11.5, color: C.inkFaint, marginLeft: 12 }}>week 1 starts now</span>
+        <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint, marginLeft: 12 }}>week 1 starts now</span>
       </div>
     </div>
   );
 }
 
 function ColLabel({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontFamily: MONO, fontSize: 11.5, letterSpacing: "0.13em", textTransform: "uppercase", color: C.accentDeep, fontWeight: 600, marginBottom: 8 }}>{children}</div>;
+  return <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.13em", textTransform: "uppercase", color: C.accentDeep, fontWeight: 600, marginBottom: 8 }}>{children}</div>;
 }
 function RowLabel({ children }: { children: React.ReactNode }) {
   return <div style={{ fontFamily: SERIF, fontSize: 15.5, fontWeight: 700, color: C.ink, marginBottom: 8 }}>{children}</div>;
@@ -103,7 +96,7 @@ function ReminderStrip({ startLabel }: { startLabel: string }) {
 
   return (
     <div style={{ marginTop: 20, padding: "16px 18px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
-      <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 12 }}>
+      <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 12 }}>
         Don&rsquo;t lose track
       </div>
 
@@ -230,23 +223,9 @@ export default function StartDayOnePage() {
 
   return (
     <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
-        .a1c-root *:focus-visible { outline: 2px solid ${C.accent}; outline-offset: 2px; border-radius: 2px; }
-        .a1c-btn,.a1c-opt,.a1c-card,.a1c-unit { transition: background-color .12s, color .12s, border-color .12s, transform .07s; }
-        .a1c-primary:hover { background: ${C.accentDeep}; }
-        .a1c-opt:hover:not(.on),.a1c-card:hover:not(.on) { border-color: ${C.accent}; }
-        .a1c-ghost:hover { color: ${C.ink}; }
-        .a1c-btn:active { transform: translateY(1px); }
-        .a1c-fade { animation: a1cFade .35s ease both; }
-        @media (prefers-reduced-motion: reduce){ .a1c-fade{ animation:none; } }
-        @keyframes a1cFade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-        input,select { font-family: ${MONO}; }
-      `}</style>
-
-      <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+<div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
         <div style={{ maxWidth: 580, margin: "0 auto", padding: "20px 22px 24px" }}>
-          <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
+          <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
             Day one · The A1C Challenge
           </span>
 
@@ -283,7 +262,7 @@ export default function StartDayOnePage() {
                           style={{ width: "100%", textAlign: "left", cursor: "pointer", padding: "13px 14px", marginBottom: 9, borderRadius: 7, background: start === i ? C.accentTint : C.card, border: `1px solid ${start === i ? C.accent : C.line}`, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
                     <span>
                       <span style={{ fontFamily: SERIF, fontSize: 15.5, fontWeight: 700, color: C.ink }}>{m.label}</span>
-                      <span style={{ display: "block", fontFamily: MONO, fontSize: 11.5, color: C.inkFaint, marginTop: 2 }}>
+                      <span style={{ display: "block", fontFamily: MONO, fontSize: 13.5, color: C.inkFaint, marginTop: 2 }}>
                         {i === 0 ? (m.soon ? "today — start now" : "this coming Monday") : "a week to settle in first"}
                       </span>
                     </span>
@@ -299,13 +278,13 @@ export default function StartDayOnePage() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <input inputMode="decimal" value={fruct} onChange={(e) => setFruct(e.target.value.replace(/[^0-9.]/g, ""))} placeholder=""
                          style={{ ...inp, width: 84 }} />
-                  <span style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkFaint }}>µmol/L</span>
+                  <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>µmol/L</span>
                 </div>
                 {fruct && (
                   <div className="a1c-fade" style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
                     {["Lab", "Home kit", "Clinic"].map((o) => (
                       <button key={o} className={`a1c-opt ${fructHow === o ? "on" : ""}`} onClick={() => setFructHow(o)}
-                              style={{ flex: "1 1 auto", fontFamily: MONO, fontSize: 12.5, padding: "8px 6px", cursor: "pointer", borderRadius: 5, background: fructHow === o ? C.accent : C.card, color: fructHow === o ? C.card : C.inkSoft, border: `1px solid ${fructHow === o ? C.accent : C.line}` }}>
+                              style={{ flex: "1 1 auto", fontFamily: MONO, fontSize: 13.5, padding: "8px 6px", cursor: "pointer", borderRadius: 5, background: fructHow === o ? C.accent : C.card, color: fructHow === o ? C.card : C.inkSoft, border: `1px solid ${fructHow === o ? C.accent : C.line}` }}>
                         {o}
                       </button>
                     ))}
