@@ -23,10 +23,10 @@ import { C, SERIF, MONO } from "@/lib/theme";
 
 const clay = "#9A5A3C", clayTint = "#EFE6DF";
 
-function Sect({ n, title, summary, children, open, onToggle }) {
+function Sect({ n, title, summary, children, open, onToggle }: { n: string; title: string; summary: string; children: React.ReactNode; open: boolean | null; onToggle: () => void }) {
   return (
     <div className="a1c-row" style={{ border: `1px solid ${C.line}`, borderRadius: 8, background: open ? C.card : "transparent", marginTop: 12, overflow: "hidden" }}>
-      <button onClick={onToggle} aria-expanded={open}
+      <button onClick={onToggle} aria-expanded={!!open}
         style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: "15px 16px", display: "flex", gap: 13, alignItems: "flex-start" }}>
         <span style={{ fontFamily: MONO, fontSize: 13, color: C.card, background: C.accent, width: 24, height: 24, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>{n}</span>
         <span style={{ flex: 1 }}>
@@ -40,7 +40,7 @@ function Sect({ n, title, summary, children, open, onToggle }) {
   );
 }
 
-function Look({ points }) {
+function Look({ points }: { points: string[] }) {
   return (
     <div style={{ marginBottom: 4 }}>
       <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 9 }}>What to look for</div>
@@ -54,7 +54,7 @@ function Look({ points }) {
   );
 }
 
-function Where({ children }) {
+function Where({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.lineSoft}` }}>
       <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 7 }}>Where to find it</div>
@@ -63,7 +63,7 @@ function Where({ children }) {
   );
 }
 
-function Caveat({ children, tone }) {
+function Caveat({ children, tone }: { children: React.ReactNode; tone: "legal" | "med" }) {
   const col = tone === "legal" ? clay : C.accentDeep;
   const bg = tone === "legal" ? clayTint : C.accentTint;
   return (
@@ -78,10 +78,10 @@ const body = { fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.6, color: C.inkS
 const bold = { color: C.ink, fontWeight: 700 };
 
 export default function GettingSetUpPage() {
-  const [open, setOpen] = useState(0);
+  const [open, setOpen] = useState<number | null>(0);
   const [toast, setToast] = useState("");
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(""), 2400); return () => clearTimeout(t); }, [toast]);
-  const tog = (i) => setOpen(open === i ? null : i);
+  const tog = (i: number) => setOpen(open === i ? null : i);
 
   // Return root JSX element
   return (
