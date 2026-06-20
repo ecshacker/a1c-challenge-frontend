@@ -22,12 +22,12 @@ const FRUCT_ZONES = [
   { from: 285, to: 360, bg: C.zoneMid, label: "elevated" },
 ];
 const WELLBEING = [
-  { key: "energy",    label: "Energy",    low: "low",     high: "high"    },
-  { key: "mood",      label: "Mood",      low: "low",     high: "high"    },
-  { key: "digestion", label: "Digestion", low: "rough",   high: "easy"    },
-  { key: "sleep",     label: "Sleep",     low: "poor",    high: "sound"   },
-  { key: "hydration", label: "Hydration", low: "low",     high: "high"    },
-  { key: "comfort",   label: "Comfort",   low: "in pain", high: "at ease" },
+  { id: "energy",    label: "Energy",    low: "low",     high: "high"    },
+  { id: "mood",      label: "Mood",      low: "low",     high: "high"    },
+  { id: "digestion", label: "Digestion", low: "rough",   high: "easy"    },
+  { id: "sleep",     label: "Sleep",     low: "poor",    high: "sound"   },
+  { id: "hydration", label: "Hydration", low: "low",     high: "high"    },
+  { id: "comfort",   label: "Comfort",   low: "in pain", high: "at ease" },
 ];
 
 // A1C test type — uses 'clinic_pharmacy', distinct from fructosamine's 'clinic'
@@ -327,11 +327,11 @@ export default function MilestonePage() {
               <div className="a1c-fade" style={{ marginTop: 22 }}>
                 <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 11 }}>How you felt</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
-                  {WELLBEING.map(({ key, label }) => {
-                    const wbKey = key === "comfort" ? "wbPain" : `wb${label}`;
+                  {WELLBEING.map(({ id, label }) => {
+                    const wbKey = id === "comfort" ? "wbPain" : `wb${label}`;
                     const v = result[wbKey] as number | null;
                     return (
-                      <div key={key} style={{ padding: "10px 12px", background: C.card, border: `1px solid ${C.lineSoft}`, borderRadius: 5 }}>
+                      <div key={id} style={{ padding: "10px 12px", background: C.card, border: `1px solid ${C.lineSoft}`, borderRadius: 5 }}>
                         <div style={{ fontFamily: MONO, fontSize: 11, color: C.inkFaint, marginBottom: 5 }}>{label}</div>
                         <div style={{ fontFamily: MONO, fontSize: 26, color: v != null ? C.ink : C.inkFaint }}>{v ?? "—"}</div>
                         <div style={{ fontFamily: MONO, fontSize: 10, color: C.inkFaint }}>of 5</div>
@@ -440,8 +440,8 @@ export default function MilestonePage() {
           <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 16 }}>How you felt overall</div>
           <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 18px" }}>One to five, looking back over the whole stretch.</p>
 
-          {WELLBEING.map((d) => (
-            <ScaleRow key={d.key} {...d} value={wb[d.key]} onPick={(v) => setWb({ ...wb, [d.key]: v })} />
+          {WELLBEING.map(({ id, ...rest }) => (
+            <ScaleRow key={id} {...rest} value={wb[id]} onPick={(v) => setWb({ ...wb, [id]: v })} />
           ))}
 
           <div style={{ height: 1, background: C.lineSoft, margin: "18px 0 22px" }} />

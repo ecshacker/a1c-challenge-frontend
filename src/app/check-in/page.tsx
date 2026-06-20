@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { api, ApiError, type ParticipantSelf } from "@/lib/api";
 import { getToken } from "@/lib/token";
 
@@ -14,12 +15,12 @@ const MONO  = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 const DAY_LETTERS = ["M", "T", "W", "T", "F", "S", "S"];
 
 const WELLBEING = [
-  { key: "energy",    label: "Energy",    low: "low",     high: "high"    },
-  { key: "mood",      label: "Mood",      low: "low",     high: "high"    },
-  { key: "digestion", label: "Digestion", low: "rough",   high: "easy"    },
-  { key: "sleep",     label: "Sleep",     low: "poor",    high: "sound"   },
-  { key: "hydration", label: "Hydration", low: "low",     high: "high"    },
-  { key: "comfort",   label: "Comfort",   low: "in pain", high: "at ease" },
+  { id: "energy",    label: "Energy",    low: "low",     high: "high"    },
+  { id: "mood",      label: "Mood",      low: "low",     high: "high"    },
+  { id: "digestion", label: "Digestion", low: "rough",   high: "easy"    },
+  { id: "sleep",     label: "Sleep",     low: "poor",    high: "sound"   },
+  { id: "hydration", label: "Hydration", low: "low",     high: "high"    },
+  { id: "comfort",   label: "Comfort",   low: "in pain", high: "at ease" },
 ];
 
 const FRUCT_TEST_MAP: Record<string, string> = { "Lab": "lab", "Home kit": "home_kit", "Clinic": "clinic" };
@@ -340,7 +341,9 @@ const btnPrimary: React.CSSProperties = { flex: 1, fontFamily: SERIF, fontSize: 
 const btnSecondary: React.CSSProperties = { flex: 1, fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.inkSoft, background: "transparent", border: `1px solid ${C.line}`, borderRadius: 5, padding: "14px", cursor: "pointer" };
 
 export default function WeeklyCheckInPage() {
+  const router = useRouter();
   const [token,          setToken]          = useState<string | null>(null);
+  const [tokenResolved,  setTokenResolved]  = useState(false);
   const [self,           setSelf]           = useState<ParticipantSelf | null>(null);
   const [studyWeek,      setStudyWeek]      = useState<number>(1);
   const [baselineEditable, setBaselineEditable] = useState(true);
@@ -380,18 +383,21 @@ export default function WeeklyCheckInPage() {
 
   // Defer token read to client-only to avoid SSR hydration mismatch
   useEffect(() => {
-    setToken(getToken());
+    const t = getToken();
+    setToken(t);
+    setTokenResolved(true);
   }, []);
 
   // On mount: fetch participant state and any existing draft
   useEffect(() => {
-    if (!token) return;
+    if (!tokenResolved) return;
+    if (!token) {
+      router.replace("/before-you-begin");
+      return;
+    }
 
-    Promise.all([
-      api.get("/participants/me"),
-      null, // placeholder — studyWeek needed before draft fetch
-    ])
-      .then(([meData]) => {
+    api.get("/participants/me")
+      .then((meData) => {
         const p = meData as ParticipantSelf;
         setSelf(p);
         const wk = p.studyWeek ?? null;
@@ -405,27 +411,30 @@ export default function WeeklyCheckInPage() {
         setBaseHeight(p.heightValue ? String(p.heightValue) : "");
         setBaseHeightUnit(p.heightUnit ?? "cm");
 
+        // Don't fetch draft if study hasn't started yet
+        if (wk == null || wk < 1) return;
+
         return api.get(`/checkins/draft?studyWeek=${wk}`);
       })
       .then((draft) => {
         if (!draft) return;
         const d = (draft as { draftData: Record<string, unknown> }).draftData;
-        if (d.hemp)    setHemp(d.hemp as (boolean | null)[]);
+        if (d.hemp)     setHemp(d.hemp as (boolean | null)[]);
         if (d.cannabis) setCannabis(d.cannabis as (boolean | null)[]);
-        if (d.hempAmt) setHempAmt(String(d.hempAmt));
-        if (d.cannAmt) setCannAmt(String(d.cannAmt));
-        if (d.wb)      setWb(d.wb as Record<string, number>);
-        if (d.weight)  setWeight(String(d.weight));
-        if (d.unit)    setUnit(d.unit as string);
-        if (d.note)    setNote(d.note as string);
+        if (d.hempAmt)  setHempAmt(String(d.hempAmt));
+        if (d.cannAmt)  setCannAmt(String(d.cannAmt));
+        if (d.wb)       setWb(d.wb as Record<string, number>);
+        if (d.weight)   setWeight(String(d.weight));
+        if (d.unit)     setUnit(d.unit as string);
+        if (d.note)     setNote(d.note as string);
       })
       .catch((err) => {
-        if (err instanceof ApiError && err.status === 404) return; // no draft — fine
+        if (err instanceof ApiError && err.status === 404) return; // no draft yet — fine
         if (err instanceof ApiError && err.error !== "NO_TOKEN") {
           setMountError(err.error);
         }
       });
-  }, [token]);
+  }, [tokenResolved, token, router]);
 
   useEffect(() => {
     if (!toast) return;
@@ -533,6 +542,8 @@ export default function WeeklyCheckInPage() {
   };
 
   const onDone = () => wbDone < 6 ? setConfirmStep("ask") : submitCheckIn();
+
+  if (!tokenResolved) return null;
 
   if (mountError) {
     return (
@@ -658,8 +669,8 @@ export default function WeeklyCheckInPage() {
           ) : (
             <div role="tabpanel" className="a1c-fade">
               <p style={prose}>A quick read on each, 1 to 5. Your sense of the week is enough — blank is a fine answer.</p>
-              {WELLBEING.map((d) => (
-                <ScaleRow key={d.key} {...d} value={wb[d.key]} onPick={(v) => setWb({ ...wb, [d.key]: v })} />
+              {WELLBEING.map(({ id, ...rest }) => (
+                <ScaleRow key={id} {...rest} value={wb[id]} onPick={(v) => setWb({ ...wb, [id]: v })} />
               ))}
               <div style={{ height: 1, background: C.lineSoft, margin: "22px 0 18px" }} />
               <label style={{ fontFamily: MONO, fontSize: 14.5, color: C.inkSoft, display: "block", marginBottom: 9 }}>Anything worth noting</label>
