@@ -106,12 +106,19 @@ function PathwayPreview() {
 
 export default function BeforeYouBeginPage() {
   const router = useRouter();
-  const [open,      setOpen]      = useState<number | null>(null);
-  const [reconnect, setReconnect] = useState(false);
-  const [code,      setCode]      = useState("");
-  const [toast,     setToast]     = useState("");
-  const [codeError, setCodeError] = useState("");
-  const [checking,  setChecking]  = useState(false);
+  const [open,       setOpen]      = useState<number | null>(null);
+  const [reconnect,  setReconnect] = useState(false);
+  const [code,       setCode]      = useState("");
+  const [toast,      setToast]     = useState("");
+  const [codeError,  setCodeError] = useState("");
+  const [checking,   setChecking]  = useState(false);
+  const [studyOpen,  setStudyOpen] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    api.publicGet("/study/status")
+      .then((d) => setStudyOpen((d as { status: string }).status === "OPEN"))
+      .catch(() => setStudyOpen(false));
+  }, []);
 
   // On load: if a token is already stored, resolve where they should be and redirect
   useEffect(() => {
@@ -222,13 +229,23 @@ export default function BeforeYouBeginPage() {
         <div style={{ maxWidth: 560, margin: "0 auto", padding: "14px 22px 16px" }}>
           {!reconnect ? (
             <>
-              <button className="a1c-btn a1c-primary" onClick={() => router.push("/enrollment")}
-                      style={{ width: "100%", fontFamily: SERIF, fontSize: 17.5, fontWeight: 700, color: C.card, background: C.accent, border: "none", borderRadius: 6, padding: "15px", cursor: "pointer" }}>
-                Begin enrollment
-              </button>
+              {studyOpen === true && (
+                <button className="a1c-btn a1c-primary" onClick={() => router.push("/enrollment")}
+                        style={{ width: "100%", fontFamily: SERIF, fontSize: 17.5, fontWeight: 700, color: C.card, background: C.accent, border: "none", borderRadius: 6, padding: "15px", cursor: "pointer" }}>
+                  Begin enrollment
+                </button>
+              )}
+              {studyOpen === false && (
+                <div style={{ padding: "14px 16px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 6 }}>
+                  <span style={{ fontFamily: SERIF, fontSize: 16, color: C.inkSoft, fontStyle: "italic" }}>
+                    Enrollment isn&rsquo;t open yet — check back soon.
+                  </span>
+                </div>
+              )}
+              {studyOpen === null && <div style={{ height: 52 }} />}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 11, gap: 10, flexWrap: "wrap" }}>
                 <span style={{ fontFamily: SERIF, fontSize: 13, color: C.inkFaint }}>
-                  Enroll now; start the weeks once you&rsquo;ve sourced everything.
+                  {studyOpen ? "Enroll now; start the weeks once you’ve sourced everything." : "Already have a code? Reconnect below."}
                 </span>
                 <button className="a1c-link" onClick={() => setReconnect(true)}
                         style={{ fontFamily: MONO, fontSize: 13.5, color: C.accentDeep, background: "none", border: "none", cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>

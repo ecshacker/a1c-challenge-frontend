@@ -1,7 +1,73 @@
-﻿import Link from "next/link";
+﻿"use client";
+
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { api } from "@/lib/api";
 import { C, SERIF, MONO } from "@/lib/theme";
 
+function EnrollCTA({ open }: { open: boolean | null }) {
+  if (open === null) return <div style={{ height: 52 }} />;
+  if (!open) return (
+    <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
+      <span style={{ fontFamily: SERIF, fontSize: 16, color: C.inkSoft, fontStyle: "italic" }}>
+        Enrollment is not yet open — check back soon.
+      </span>
+      <Link href="/before-you-begin"
+            style={{ fontFamily: MONO, fontSize: 13, color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>
+        I already have a code →
+      </Link>
+    </div>
+  );
+  return (
+    <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
+      <Link href="/before-you-begin"
+            style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "14px 28px", textDecoration: "none", display: "inline-block" }}>
+        Learn more and enroll →
+      </Link>
+      <Link href="/before-you-begin"
+            style={{ fontFamily: MONO, fontSize: 13, color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>
+        I already have a code →
+      </Link>
+    </div>
+  );
+}
+
+function EnrollCard({ open }: { open: boolean | null }) {
+  if (open === null) return <div style={{ height: 48 }} />;
+  if (!open) return (
+    <div style={{ textAlign: "center" }}>
+      <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 26, color: C.ink, marginBottom: 12 }}>Ready to take part?</div>
+      <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 16px" }}>
+        Enrollment isn&rsquo;t open yet. Check back soon — or{" "}
+        <Link href="/before-you-begin" style={{ color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>enter your code</Link>
+        {" "}if you already have one.
+      </p>
+    </div>
+  );
+  return (
+    <div style={{ textAlign: "center" }}>
+      <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 26, color: C.ink, marginBottom: 12 }}>Ready to take part?</div>
+      <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 24px" }}>
+        No name. No email. You get a code — that&rsquo;s your whole identity here.<br />
+        Enroll now; start the weeks once you&rsquo;ve sourced everything.
+      </p>
+      <Link href="/before-you-begin"
+            style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "14px 32px", textDecoration: "none", display: "inline-block" }}>
+        Begin enrollment →
+      </Link>
+    </div>
+  );
+}
+
 export default function LandingPage() {
+  const [studyOpen, setStudyOpen] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    api.publicGet("/study/status")
+      .then((d) => setStudyOpen((d as { status: string }).status === "OPEN"))
+      .catch(() => setStudyOpen(false));
+  }, []);
+
   return (
     <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink }}>
 {/* Hero */}
@@ -16,16 +82,7 @@ export default function LandingPage() {
           <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 32px", maxWidth: 580 }}>
             When hemp seed and raw cannabis flower are eaten as food — raw, never heated — does blood-sugar control shift over four weeks? This study asks that question in the open, with every record available for anyone to examine.
           </p>
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
-            <Link href="/before-you-begin"
-                  style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "14px 28px", textDecoration: "none", display: "inline-block" }}>
-              Learn more and enroll →
-            </Link>
-            <Link href="/before-you-begin"
-                  style={{ fontFamily: MONO, fontSize: 13, color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>
-              I already have a code →
-            </Link>
-          </div>
+          <EnrollCTA open={studyOpen} />
         </div>
       </div>
 
@@ -99,16 +156,8 @@ export default function LandingPage() {
         </div>
 
         {/* CTA */}
-        <div style={{ marginTop: 48, padding: "32px 28px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8, textAlign: "center" }}>
-          <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 26, color: C.ink, marginBottom: 12 }}>Ready to take part?</div>
-          <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 24px" }}>
-            No name. No email. You get a code — that&rsquo;s your whole identity here.<br />
-            Enroll now; start the weeks once you&rsquo;ve sourced everything.
-          </p>
-          <Link href="/before-you-begin"
-                style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "14px 32px", textDecoration: "none", display: "inline-block" }}>
-            Begin enrollment →
-          </Link>
+        <div style={{ marginTop: 48, padding: "32px 28px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
+          <EnrollCard open={studyOpen} />
         </div>
 
         {/* Footer */}

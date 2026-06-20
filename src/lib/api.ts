@@ -12,6 +12,14 @@ export class ApiError extends Error {
   }
 }
 
+async function publicRequest(path: string): Promise<unknown> {
+  const res = await fetch(`${BASE}${path}`, { method: "GET", headers: { "Content-Type": "application/json" } });
+  if (res.status === 204) return null;
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new ApiError(res.status, data.error ?? "Request failed", data.details);
+  return data;
+}
+
 async function request(method: string, path: string, body?: unknown): Promise<unknown> {
   const isEnroll = method === "POST" && path === "/participants/enroll";
   const token = getToken();
@@ -41,9 +49,10 @@ async function request(method: string, path: string, body?: unknown): Promise<un
 }
 
 export const api = {
-  get:   (path: string)                 => request("GET",   path),
-  post:  (path: string, body?: unknown) => request("POST",  path, body),
-  patch: (path: string, body?: unknown) => request("PATCH", path, body),
+  get:       (path: string)                 => request("GET",   path),
+  post:      (path: string, body?: unknown) => request("POST",  path, body),
+  patch:     (path: string, body?: unknown) => request("PATCH", path, body),
+  publicGet: (path: string)                 => publicRequest(path),
 };
 
 export interface ParticipantSelf {

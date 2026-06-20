@@ -240,6 +240,17 @@ const sel: React.CSSProperties  = { fontFamily: SERIF, fontSize: 15.5, padding: 
 
 export default function EnrollmentIntakePage() {
   const router = useRouter();
+
+  // Gate: redirect to before-you-begin if study is not OPEN
+  useEffect(() => {
+    api.publicGet("/study/status")
+      .then((d) => {
+        if ((d as { status: string }).status !== "OPEN") router.replace("/before-you-begin");
+      })
+      .catch(() => router.replace("/before-you-begin"));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [step, setStep] = useState(0);
   const [token, setToken] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
