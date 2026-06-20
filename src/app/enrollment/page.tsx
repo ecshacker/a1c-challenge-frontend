@@ -241,8 +241,9 @@ const sel: React.CSSProperties  = { fontFamily: SERIF, fontSize: 15.5, padding: 
 export default function EnrollmentIntakePage() {
   const router = useRouter();
 
-  // Gate: redirect to before-you-begin if study is not OPEN
+  // Gate: redirect to before-you-begin if study is not OPEN (bypassed by testpad session)
   useEffect(() => {
+    if (sessionStorage.getItem("a1c_testpad_session")) return;
     api.publicGet("/study/status")
       .then((d) => {
         if ((d as { status: string }).status !== "OPEN") router.replace("/before-you-begin");

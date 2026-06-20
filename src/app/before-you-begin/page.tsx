@@ -115,6 +115,7 @@ export default function BeforeYouBeginPage() {
   const [studyOpen,  setStudyOpen] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (sessionStorage.getItem("a1c_testpad_session")) { setStudyOpen(true); return; }
     api.publicGet("/study/status")
       .then((d) => setStudyOpen((d as { status: string }).status === "OPEN"))
       .catch(() => setStudyOpen(false));
