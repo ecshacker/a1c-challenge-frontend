@@ -154,7 +154,7 @@ export default function LandingPage() {
             {" "}with matching implementation documentation for those who wish to follow the methodology.
           </p>
           <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: 0 }}>
-            The book <a href="https://cannabis-is-food.com" target="_blank">Cannabis Is
+            The book <a href="https://cannabis-is-food.com" target="_blank" rel="noopener noreferrer">Cannabis Is
             Food</a> was instrumental in creating the OSF pre-registered RWE cohort study and this app.
               Use discount code A1C for a $9.95 discount that makes the ebook free or the ebook plus printed edition $15.
           </p>
