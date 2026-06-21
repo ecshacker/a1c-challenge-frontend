@@ -59,6 +59,39 @@ function EnrollCard({ open }: { open: boolean | null }) {
   );
 }
 
+function HypothesisBlock() {
+  const [curious, setCurious] = useState(false);
+  return (
+    <div style={{ marginTop: 44, padding: "26px 28px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
+      <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 18 }}>Why would food move blood sugar at all?</div>
+      <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 16px" }}>
+        Consider scurvy. For centuries it looked like a disease — sailors wasted away from it — until it turned out to be something simpler: a missing nutrient. Give the body vitamin C, and it repairs itself. No drug. Just the input it had been lacking.
+      </p>
+      <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 16px" }}>
+        This study asks a careful version of that question for blood sugar. Not whether a food can push the number down — but whether the body&rsquo;s been missing an input, and rights itself once it has it back.
+      </p>
+      <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.ink, margin: "0 0 20px", fontStyle: "italic" }}>
+        The study is built so that if the answer is no, that shows too — in public.
+      </p>
+      <button onClick={() => setCurious(!curious)}
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.12em", textTransform: "uppercase", color: C.accentDeep, fontWeight: 600 }}>
+          For the curious: how we&rsquo;d tell
+        </span>
+        <span style={{ fontFamily: MONO, fontSize: 16, color: C.accentDeep, lineHeight: 1 }}>{curious ? "–" : "+"}</span>
+      </button>
+      {curious && (
+        <div className="a1c-fade" style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${C.lineSoft}` }}>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 12 }}>How will we know?</div>
+          <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: C.inkSoft, margin: 0 }}>
+            Blood sugar leaves two marks at two speeds: fructosamine reflects the last few weeks, A1C the last few months. Both can move — a drug that simply holds glucose down would move them too. So the question isn&rsquo;t <em>whether</em> they move, but in what order. If the correction is real and upstream, the faster mark shifts first and the slower one follows. That ordering is the signature of a nutritional correction — the pattern you&rsquo;d expect if Type 2 Diabetes had a nutritional component, not only a glucose to be pushed down. Even then it wouldn&rsquo;t be proof: if both marks move more than standard care would predict, that&rsquo;s striking — and still doesn&rsquo;t rule out other explanations. The ordering is the fingerprint we&rsquo;re watching for, and four weeks is just long enough to see it begin.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const [studyOpen, setStudyOpen] = useState<boolean | null>(null);
 
@@ -89,36 +122,14 @@ export default function LandingPage() {
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 64px" }}>
 
         {/* The hypothesis */}
-        <div style={{ marginTop: 44, padding: "26px 28px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
-          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 14 }}>The hypothesis</div>
-          <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 16px" }}>
-            If a faster biomarker moves ahead of a slower one, that ordering is consistent with an upstream correction rather than downstream glucose suppression. It doesn&rsquo;t rule out other explanations.
-          </p>
-          <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 16px" }}>
-            What we&rsquo;re testing is whether a nutritional correction behaves that way — the pattern you&rsquo;d expect if a condition like Type 2 Diabetes had a nutritional component, the way scurvy does.
-          </p>
-          <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.ink, margin: 0, fontStyle: "italic" }}>
-            The cohort is built to let that prediction fail in public if it&rsquo;s wrong.
-          </p>
-        </div>
+        <HypothesisBlock />
 
-        {/* How it works */}
+        {/* The shape of it */}
         <div style={{ marginTop: 44 }}>
-          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 20, paddingBottom: 10, borderBottom: `1px solid ${C.line}` }}>How it works</div>
-          {[
-            { n: "1", head: "Enroll and set a baseline", body: "Any day works. You give a starting A1C and a few details — no name, no email. You get a code; that's your whole identity here." },
-            { n: "2", head: "Start on a Monday", body: "Once you've sourced the food, pick a Monday to begin. Your weeks run Monday to Sunday from there, so nothing is half a week." },
-            { n: "3", head: "Five minutes, once a week", body: "A short check-in: what you ate, and how the week felt. You can fix last week while this week is still open." },
-            { n: "4", head: "A second A1C at week 4", body: "One more reading closes the four weeks. That comparison — baseline to week 4 — is the whole point. A week-8 reading is welcome but optional." },
-          ].map(({ n, head, body }) => (
-            <div key={n} style={{ display: "flex", gap: 16, marginBottom: 22 }}>
-              <div style={{ fontFamily: MONO, fontSize: 13, color: C.card, background: C.accent, width: 26, height: 26, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>{n}</div>
-              <div>
-                <div style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 4 }}>{head}</div>
-                <div style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft }}>{body}</div>
-              </div>
-            </div>
-          ))}
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.line}` }}>The shape of it</div>
+          <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.65, color: C.inkSoft, margin: 0 }}>
+            A starting A1C, four weeks of the food with a five-minute check-in each week, then a second A1C. That before-and-after — yours, and the crowd&rsquo;s — is the whole study. No name, no email.
+          </p>
         </div>
 
         {/* Open science */}
