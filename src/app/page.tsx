@@ -83,9 +83,15 @@ function HypothesisBlock() {
       {curious && (
         <div className="a1c-fade" style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${C.lineSoft}` }}>
           <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 12 }}>How will we know?</div>
-          <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: C.inkSoft, margin: 0 }}>
-            Blood sugar leaves two marks at two speeds: fructosamine reflects the last few weeks, A1C the last few months. Both can move — a drug that simply holds glucose down would move them too. So the question isn&rsquo;t <em>whether</em> they move, but in what order. If the correction is real and upstream, the faster mark shifts first and the slower one follows. That ordering is the signature of a nutritional correction — the pattern you&rsquo;d expect if Type 2 Diabetes had a nutritional component, not only a glucose to be pushed down. Even then it wouldn&rsquo;t be proof: if both marks move more than standard care would predict, that&rsquo;s striking — and still doesn&rsquo;t rule out other explanations. The ordering is the fingerprint we&rsquo;re watching for, and four weeks is just long enough to see it begin.
-          </p>
+            <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: C.inkSoft, margin: 0 }}>
+                Blood sugar leaves two marks at two speeds: fructosamine reflects the last few weeks, A1C the last few months. Both can move — a drug that simply holds glucose down would move them too. So the question isn&rsquo;t whether they move, but in what order.
+            </p>
+            <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: C.inkSoft, margin: 0 }}>
+                If the correction is real and upstream, the faster mark shifts first and the slower one follows. That ordering is the signature of a nutritional correction — the pattern you&rsquo;d expect if a condition like Type 2 Diabetes had a nutritional component, not only a glucose to be pushed down.
+            </p>
+            <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: C.inkSoft, margin: 0 }}>
+                Even then it wouldn&rsquo;t be proof: if both marks move more than standard care would predict, that&rsquo;s striking — and still doesn&rsquo;t rule out other explanations. The ordering is the fingerprint we&rsquo;re watching for, and four weeks is just long enough to see it begin.
+            </p>
         </div>
       )}
     </div>
@@ -113,7 +119,7 @@ export default function LandingPage() {
             A shared, open look at blood-sugar control
           </h1>
           <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 32px", maxWidth: 580 }}>
-            When hemp seed and raw cannabis flower are eaten as food — raw, never heated — does blood-sugar control shift over four weeks? This study asks that question in the open, with every record available for anyone to examine.
+            When hemp seed and raw cannabis flower are eaten as food — raw, the flower never heated — does blood-sugar control shift over four weeks? This study asks that question in the open, with every record available for anyone to examine.
           </p>
           <EnrollCTA open={studyOpen} />
         </div>
@@ -150,6 +156,7 @@ export default function LandingPage() {
           <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: 0 }}>
             The book <a href="https://cannabis-is-food.com" target="_blank">Cannabis Is
             Food</a> was instrumental in creating the OSF pre-registered RWE cohort study and this app.
+              Use discount code A1C for a $9.95 discount that makes the ebook free or the ebook plus printed edition $15.
           </p>
         </div>
 
