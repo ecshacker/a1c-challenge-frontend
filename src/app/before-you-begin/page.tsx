@@ -166,9 +166,9 @@ export default function BeforeYouBeginPage() {
   };
 
   return (
-    <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
-<div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-        <div style={{ maxWidth: 560, margin: "0 auto", padding: "26px 22px 28px" }}>
+    <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink }} className="a1c-root">
+      <div>
+        <div style={{ maxWidth: 560, margin: "0 auto", padding: "26px 22px 64px" }}>
           <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
             The A1C Challenge
           </div>
@@ -218,16 +218,13 @@ export default function BeforeYouBeginPage() {
             <div style={{ marginTop: 20 }}><PathwayPreview /></div>
           </Section>
 
-          <Section label="What you're agreeing to">
+          <Section label="What you’re agreeing to">
             <Ethos head="You stay anonymous">You get a code — that&rsquo;s your whole identity here. Write it down; it&rsquo;s how you return, on this device or any other.</Ethos>
             <Ethos head="Your record becomes open data">Anonymized and released under CC0 for anyone to study.</Ethos>
             <Ethos head="You can stop any time">This isn&rsquo;t medical care, and nothing here replaces your clinician. Leave whenever you like.</Ethos>
           </Section>
-        </div>
-      </div>
 
-      <div style={{ borderTop: `1px solid ${C.line}`, background: C.card, flexShrink: 0 }}>
-        <div style={{ maxWidth: 560, margin: "0 auto", padding: "14px 22px 16px" }}>
+          <div style={{ marginTop: 36, paddingTop: 28, borderTop: `1px solid ${C.line}` }}>
           {!reconnect ? (
             <>
               {studyOpen === true && (
@@ -276,11 +273,12 @@ export default function BeforeYouBeginPage() {
               </button>
             </div>
           )}
+          </div>
         </div>
       </div>
 
       {toast && (
-        <div className="a1c-fade" style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", bottom: 150, background: C.ink, color: C.card, fontFamily: MONO, fontSize: 13, padding: "10px 16px", borderRadius: 6, zIndex: 60 }}>
+        <div className="a1c-fade" style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", bottom: 28, background: C.ink, color: C.card, fontFamily: MONO, fontSize: 13, padding: "10px 16px", borderRadius: 6, zIndex: 60 }}>
           {toast}
         </div>
       )}
