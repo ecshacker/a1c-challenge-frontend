@@ -206,7 +206,6 @@ export default function BeforeYouBeginPage() {
               </p>
               <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 13px" }}>
                 Raw, unheated flower takes a little planning to source, and whether this is legal and appropriate for you depends on where you are and your own health picture.
-                Recommend reading the <a href="https://cannabis-is-food.com/discount/A1C?redirect=%2Fproducts%2Fcannabis-is-food-book" target="_blank" rel="noopener noreferrer">Cannabis Is Food</a> book or searching online for &ldquo;hemp hearts&rdquo; if you lack local stores nearby.
               </p>
               <ExtLink>What &ldquo;raw&rdquo; means, and where to look</ExtLink>
             </Prereq>
