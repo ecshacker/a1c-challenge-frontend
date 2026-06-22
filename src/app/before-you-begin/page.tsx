@@ -176,7 +176,7 @@ export default function BeforeYouBeginPage() {
             Before you begin
           </h1>
           <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.62, color: C.inkSoft, margin: "18px 0 0" }}>
-            This is a shared, open look at one question: when hemp seed and raw cannabis flower are eaten as food — raw, never heated — does blood-sugar control shift over four weeks? It&rsquo;s observational. You&rsquo;re not being treated or told to stop anything. You eat, you measure, you record what happens — and so does everyone else taking part.
+            This is a shared, open look at one question: when hemp seed and raw cannabis flower are eaten as food — raw, the flower never heated — does blood-sugar control shift over four weeks? It&rsquo;s observational. You&rsquo;re not being treated or told to stop anything. You eat, you measure, you record what happens, stop any time — and so does everyone else taking part.
           </p>
 
           <Section label="Why take part">
@@ -190,7 +190,7 @@ export default function BeforeYouBeginPage() {
               <strong style={{ color: C.ink, fontWeight: 700 }}>Your part becomes everyone&rsquo;s.</strong> Anonymized and open, your month of records joins the rest into something any researcher — or any curious person — can examine for themselves.
             </p>
             <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 13px" }}>
-              <strong style={{ color: C.ink, fontWeight: 700 }}>You leave with your own numbers.</strong> However the larger answer turns out, you finish with your own baseline and a week-4 reading, and a record of your month.
+              <strong style={{ color: C.ink, fontWeight: 700 }}>You leave with your own answer <em>and </em> feed everyone&rsquo;s.</strong> However the larger answer turns out, you finish with your own baseline and a week-4 reading, and a record of your month.
             </p>
             <div style={{ marginTop: 18, padding: "14px 16px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 6 }}>
               <span style={{ fontFamily: SERIF, fontSize: 16, fontStyle: "italic", lineHeight: 1.55, color: C.accentDeep }}>
@@ -201,7 +201,13 @@ export default function BeforeYouBeginPage() {
 
           <Section label="What you'll need">
             <Prereq title="The food" summary="Hemp seed and raw cannabis flower, eaten raw." open={open === 0} onToggle={() => setOpen(open === 0 ? null : 0)}>
-              Hemp seed is easy to find — whole or shelled, raw, kept cold. Raw cannabis flower means flower that has never been heated or decarboxylated; heat changes it from the food we&rsquo;re looking at into something else.
+              <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 13px" }}>
+                Hemp seed is easy to find — whole or shelled, raw, kept cold. Raw cannabis flower means flower that has never been heated or decarboxylated; heat changes it from the food we&rsquo;re looking at into something else.
+              </p>
+              <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 13px" }}>
+                Raw, unheated flower takes a little planning to source, and whether this is legal and appropriate for you depends on where you are and your own health picture.
+                Recommend reading the <a href="https://cannabis-is-food.com/products/cannabis-is-food-book?discount=A1C" target="_blank" rel="noopener noreferrer">Cannabis Is Food</a> book or searching online for &lquot;hemp hearts&lrquot; if you lack local stores nearby.
+              </p>
               <ExtLink>What &ldquo;raw&rdquo; means, and where to look</ExtLink>
             </Prereq>
             <Prereq title="A way to measure" summary="An A1C reading at the start, and again at week 4." open={open === 1} onToggle={() => setOpen(open === 1 ? null : 1)}>
