@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type ParticipantSelf } from "@/lib/api";
 import { getToken, setPendingToken, persistToken, clearToken } from "@/lib/token";
@@ -49,12 +50,12 @@ function Prereq({ title, summary, children, open, onToggle }: { title: string; s
   );
 }
 
-function ExtLink({ children }: { children: React.ReactNode }) {
+function ExtLink({ children, href }: { children: React.ReactNode; href: string }) {
   return (
-    <a href="#" onClick={(e) => e.preventDefault()} className="a1c-link"
+    <Link href={href} className="a1c-link"
        style={{ display: "inline-block", marginTop: 11, fontFamily: MONO, fontSize: 13.5, color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>
-      {children} ↗
-    </a>
+      {children} →
+    </Link>
   );
 }
 
@@ -207,11 +208,11 @@ export default function BeforeYouBeginPage() {
               <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 13px" }}>
                 Raw, unheated flower takes a little planning to source, and whether this is legal and appropriate for you depends on where you are and your own health picture.
               </p>
-              <ExtLink>What &ldquo;raw&rdquo; means, and where to look</ExtLink>
+              <ExtLink href="/the-food">What &ldquo;raw&rdquo; means, and where to look</ExtLink>
             </Prereq>
             <Prereq title="A way to measure" summary="An A1C reading at the start, and again at week 4." open={open === 1} onToggle={() => setOpen(open === 1 ? null : 1)}>
               A1C reflects roughly three months of blood sugar, so one reading sets your baseline and a second at week 4 shows the change. You can get it from a home kit, a pharmacy, or a clinic.
-              <ExtLink>Ways to get an A1C</ExtLink>
+              <ExtLink href="/getting-set-up">Ways to get an A1C</ExtLink>
             </Prereq>
           </Section>
 
