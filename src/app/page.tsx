@@ -208,7 +208,7 @@ function EnrollCard({ open }: { open: boolean | null }) {
 function HypothesisBlock() {
   const [curious, setCurious] = useState(false);
   return (
-    <div style={{ marginTop: 44, padding: "26px 28px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
+    <div style={{ marginTop: 44, padding: "26px 14px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
       <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 18 }}>Why would food move blood sugar at all?</div>
       <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 16px" }}>
         Consider scurvy. For centuries it looked like a disease — sailors wasted away from it — until it turned out to be something simpler: a missing nutrient. Give the body vitamin C, and it repairs itself. No drug. Just the input it had been lacking.
@@ -257,7 +257,7 @@ export default function LandingPage() {
     <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink }}>
 {/* Hero */}
       <div style={{ borderBottom: `1px solid ${C.line}`, background: C.card }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "28px 24px 24px" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "28px 12px 24px" }}>
           <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft, marginBottom: 14 }}>
             The A1C Challenge
           </div>
@@ -270,7 +270,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 64px" }}>
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 12px 64px" }}>
 
         {/* The hypothesis */}
         <HypothesisBlock />
@@ -284,7 +284,7 @@ export default function LandingPage() {
         </div>
 
         {/* Open science */}
-        <div style={{ marginTop: 44, padding: "26px 28px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 8 }}>
+        <div style={{ marginTop: 44, padding: "26px 14px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 8 }}>
           <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 14 }}>Open science</div>
           <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 14px" }}>
             This app is open-source and feeds an append-only{" "}
