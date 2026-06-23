@@ -182,7 +182,7 @@ function EnrollCTA({ open }: { open: boolean | null }) {
   if (!open) return (
     <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
       <span style={{ fontFamily: SERIF, fontSize: 16, color: C.inkSoft, fontStyle: "italic" }}>
-        Enrollment is not yet open — check back soon.
+        Enrollment opens by Friday — check back soon.
       </span>
       <Link href="/before-you-begin"
             style={{ fontFamily: MONO, fontSize: 13, color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>

@@ -242,7 +242,7 @@ export default function BeforeYouBeginPage() {
               {studyOpen === false && (
                 <div style={{ padding: "14px 16px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 6 }}>
                   <span style={{ fontFamily: SERIF, fontSize: 16, color: C.inkSoft, fontStyle: "italic" }}>
-                    Enrollment isn&rsquo;t open yet — check back soon.
+                    Enrollment opens by Friday — check back soon.
                   </span>
                 </div>
               )}
