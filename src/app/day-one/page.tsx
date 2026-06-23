@@ -224,7 +224,7 @@ export default function StartDayOnePage() {
   return (
     <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
 <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-        <div style={{ maxWidth: 580, margin: "0 auto", padding: "20px 22px 24px" }}>
+        <div style={{ maxWidth: 580, width: "100%", margin: "0 auto", padding: "20px 18px 24px", boxSizing: "border-box" }}>
           <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
             Day one · The A1C Challenge
           </span>
@@ -308,7 +308,7 @@ export default function StartDayOnePage() {
       </div>
 
       <div style={{ borderTop: `1px solid ${C.line}`, background: C.card, flexShrink: 0 }}>
-        <div style={{ maxWidth: 580, margin: "0 auto", padding: "13px 22px 15px" }}>
+        <div style={{ maxWidth: 580, width: "100%", margin: "0 auto", padding: "13px 18px 15px", boxSizing: "border-box" }}>
           <button className="a1c-btn a1c-primary" onClick={handleBegin}
                   disabled={loading || (locked && (studyWeek == null || studyWeek < 1))}
                   style={{ width: "100%", fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: loading ? C.line : locked && (studyWeek == null || studyWeek < 1) ? C.line : C.accent, border: "none", borderRadius: 6, padding: "14px", cursor: loading || (locked && (studyWeek == null || studyWeek < 1)) ? "default" : "pointer" }}>

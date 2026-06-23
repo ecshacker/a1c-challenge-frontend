@@ -167,9 +167,9 @@ export default function BeforeYouBeginPage() {
   };
 
   return (
-    <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink }} className="a1c-root">
+    <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink, overflowX: "hidden" }} className="a1c-root">
       <div>
-        <div style={{ maxWidth: 560, margin: "0 auto", padding: "26px 22px 64px" }}>
+        <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "26px 18px 64px", boxSizing: "border-box" }}>
           <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
             The A1C Challenge
           </div>

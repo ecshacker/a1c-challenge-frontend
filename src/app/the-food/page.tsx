@@ -23,8 +23,8 @@ function Callout({ children }: { children: React.ReactNode }) {
 
 export default function TheFoodPage() {
   return (
-    <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink }}>
-      <div style={{ maxWidth: 660, margin: "0 auto", padding: "40px 24px 72px" }}>
+    <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink, overflowX: "hidden" }}>
+      <div style={{ maxWidth: 660, width: "100%", margin: "0 auto", padding: "40px 18px 72px", boxSizing: "border-box" }}>
 
         <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft, marginBottom: 16 }}>
           <Link href="/before-you-begin" style={{ color: C.inkFaint, textDecoration: "none" }}>Before you begin</Link>

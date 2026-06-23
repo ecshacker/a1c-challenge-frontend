@@ -88,9 +88,9 @@ export default function GettingSetUpPage() {
 
   // Return root JSX element
   return (
-      <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink }} className="a1c-root">
+      <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink, overflowX: "hidden" }} className="a1c-root">
       <div>
-          <div style={{maxWidth: 560, margin: "0 auto", padding: "24px 22px 64px"}}>
+          <div style={{maxWidth: 560, width: "100%", margin: "0 auto", padding: "24px 18px 64px", boxSizing: "border-box"}}>
           <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
             Getting set up ·{" "}
             <Link href="/before-you-begin" style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accentDeep, textDecoration: "none" }}>
@@ -215,7 +215,7 @@ export default function GettingSetUpPage() {
 
         {/* sticky */}
         <div style={{borderTop: `1px solid ${C.line}`, background: C.card, flexShrink: 0}}>
-          <div style={{maxWidth: 560, margin: "0 auto", padding: "14px 22px 16px"}}>
+          <div style={{maxWidth: 560, width: "100%", margin: "0 auto", padding: "14px 18px 16px", boxSizing: "border-box"}}>
             <button className="a1c-btn a1c-primary" onClick={() => router.push("/enrollment")}
                     style={{
                       width: "100%",

@@ -269,7 +269,7 @@ export default function MilestonePage() {
     return (
       <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
 <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-          <div style={{ maxWidth: 560, margin: "0 auto", padding: "24px 22px 28px" }}>
+          <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "24px 18px 28px", boxSizing: "border-box" }}>
             <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accentDeep }}>Week {studyWeek} · milestone</div>
             <h1 style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 38, lineHeight: 1.08, letterSpacing: "-0.02em", margin: "12px 0 0" }}>
               Your {studyWeek <= 4 ? "four" : "eight"}-week mark
@@ -338,7 +338,7 @@ export default function MilestonePage() {
         </div>
 
         <div style={{ borderTop: `1px solid ${C.line}`, background: C.card, flexShrink: 0 }}>
-          <div style={{ maxWidth: 560, margin: "0 auto", padding: "13px 22px 15px" }}>
+          <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "13px 18px 15px", boxSizing: "border-box" }}>
             <div style={{ display: "flex", gap: 12 }}>
               <button className="a1c-btn a1c-secondary" onClick={() => setToast("This shares the study link, not your numbers.")}
                       style={{ flex: 1, fontFamily: SERIF, fontSize: 16, fontWeight: 700, color: C.inkSoft, background: "transparent", border: `1px solid ${C.line}`, borderRadius: 6, padding: "14px", cursor: "pointer" }}>
@@ -368,7 +368,7 @@ export default function MilestonePage() {
   return (
     <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
 <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-        <div style={{ maxWidth: 560, margin: "0 auto", padding: "24px 22px 28px" }}>
+        <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "24px 18px 28px", boxSizing: "border-box" }}>
           <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accentDeep }}>Week {studyWeek} · milestone</div>
           <h1 style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 36, lineHeight: 1.08, letterSpacing: "-0.02em", margin: "10px 0 0" }}>
             Your {studyWeek <= 4 ? "four" : "eight"}-week reading
@@ -461,7 +461,7 @@ export default function MilestonePage() {
       </div>
 
       <div style={{ borderTop: `1px solid ${C.line}`, background: C.card, flexShrink: 0 }}>
-        <div style={{ maxWidth: 560, margin: "0 auto", padding: "13px 22px 15px" }}>
+        <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "13px 18px 15px", boxSizing: "border-box" }}>
           <button className="a1c-btn a1c-primary" onClick={submit} disabled={!canSubmit || submitting}
                   style={{ width: "100%", fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: canSubmit && !submitting ? C.accent : C.line, border: "none", borderRadius: 6, padding: "14px", cursor: canSubmit && !submitting ? "pointer" : "default" }}>
             {submitting ? "Saving…" : "Record my milestone"}

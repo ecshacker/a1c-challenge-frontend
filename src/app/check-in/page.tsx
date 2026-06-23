@@ -262,7 +262,7 @@ function EducationPane() {
 
   return (
     <div style={{ borderTop: `1px solid ${C.line}`, background: C.card, flexShrink: 0 }}>
-      <div style={{ maxWidth: 560, margin: "0 auto", padding: "13px 22px 15px" }}>
+      <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "13px 18px 15px", boxSizing: "border-box" }}>
         <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.16em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 7 }}>Good to know</div>
         <div style={{ fontFamily: SERIF, fontSize: 15, lineHeight: 1.55, color: C.inkSoft }}>
           Hemp seed and raw flower are <strong style={{ color: C.ink, fontWeight: 700 }}>foods</strong> here — eaten as part of your day, raw, unless your clinician says otherwise. This sheet waits for you: open it whenever suits your week.
@@ -565,7 +565,7 @@ export default function WeeklyCheckInPage() {
   return (
     <div className="a1c-root" style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }}>
 <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-        <div style={{ maxWidth: 560, margin: "0 auto", padding: "18px 22px 26px" }}>
+        <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "18px 18px 26px", boxSizing: "border-box" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, position: "relative" }}>
             <button className="a1c-info" onClick={() => setPopover(popover === "title" ? null : "title")} aria-expanded={popover === "title"}
                     style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.04em", color: C.inkSoft, background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}>

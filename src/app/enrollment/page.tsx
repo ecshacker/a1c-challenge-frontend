@@ -371,7 +371,7 @@ export default function EnrollmentIntakePage() {
     <div style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }} className="a1c-root">
 {step < 4 && (
         <div style={{ flexShrink: 0, borderBottom: `1px solid ${C.line}`, background: C.pageBg }}>
-          <div style={{ maxWidth: 560, margin: "0 auto", padding: "20px 22px 16px" }}>
+          <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "20px 18px 16px", boxSizing: "border-box" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
                 Enroll · The A1C Challenge
@@ -389,7 +389,7 @@ export default function EnrollmentIntakePage() {
       )}
 
       <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-        <div style={{ maxWidth: 560, margin: "0 auto", padding: step < 4 ? "22px 22px 28px" : "0" }}>
+        <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: step < 4 ? "22px 18px 28px" : "0", boxSizing: "border-box" }}>
 
           {step === 0 && (
             <div className="a1c-fade">
@@ -554,7 +554,7 @@ export default function EnrollmentIntakePage() {
 
       {step < 4 && (
         <div style={{ flexShrink: 0, borderTop: `1px solid ${C.line}`, background: C.card }}>
-          <div style={{ maxWidth: 560, margin: "0 auto", padding: "14px 22px 16px", display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "14px 18px 16px", boxSizing: "border-box", display: "flex", alignItems: "center", gap: 14 }}>
             {step > 0 ? (
               <button className="a1c-ghost" onClick={() => setStep(step - 1)}
                       style={{ fontFamily: SERIF, fontSize: 15, color: C.inkSoft, background: "none", border: "none", cursor: "pointer", padding: "6px 2px" }}>← Back</button>
