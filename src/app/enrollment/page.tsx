@@ -374,7 +374,7 @@ export default function EnrollmentIntakePage() {
           <div style={{ maxWidth: 560, margin: "0 auto", padding: "20px 22px 16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
-                Enrol · The A1C Challenge
+                Enroll · The A1C Challenge
               </span>
               <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>step {step + 1} of 4</span>
             </div>

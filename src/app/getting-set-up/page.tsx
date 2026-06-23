@@ -1,6 +1,7 @@
 ﻿"use client"; // Required at the very top since your views track local states via hooks
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 /**
  * A1C Challenge — "Getting set up" (sourcing & testing enablement)
@@ -78,6 +79,7 @@ const body = { fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.6, color: C.inkS
 const bold = { color: C.ink, fontWeight: 700 };
 
 export default function GettingSetUpPage() {
+  const router = useRouter();
   const [open, setOpen] = useState<number | null>(0);
   const [toast, setToast] = useState("");
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(""), 2400); return () => clearTimeout(t); }, [toast]);
@@ -128,7 +130,7 @@ export default function GettingSetUpPage() {
             }}>Getting set up</h1>
             <p style={{fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.6, color: C.inkSoft, margin: "15px 0 0"}}>
               Two foods and a way to measure — that&rsquo;s all the study needs from you. Here&rsquo;s how to get each,
-              honestly. None of it has to be in hand to enrol; you can sort it during your sourcing runway.
+              honestly. None of it has to be in hand to enroll; you can sort it during your sourcing runway.
             </p>
 
             {/* location hook */}
@@ -236,7 +238,7 @@ export default function GettingSetUpPage() {
         {/* sticky */}
         <div style={{borderTop: `1px solid ${C.line}`, background: C.card, flexShrink: 0}}>
           <div style={{maxWidth: 560, margin: "0 auto", padding: "14px 22px 16px"}}>
-            <button className="a1c-btn a1c-primary" onClick={() => setToast("→ enrolment")}
+            <button className="a1c-btn a1c-primary" onClick={() => router.push("/enrollment")}
                     style={{
                       width: "100%",
                       fontFamily: SERIF,
@@ -249,10 +251,10 @@ export default function GettingSetUpPage() {
                       padding: "15px",
                       cursor: "pointer"
                     }}>
-              When you&rsquo;re set, enrol
+              When you&rsquo;re set, enroll
             </button>
             <p style={{fontFamily: SERIF, fontSize: 13, color: C.inkFaint, margin: "10px 2px 0", textAlign: "center"}}>
-              You can enrol and give a baseline now, and start the weeks once you&rsquo;ve gathered everything.
+              You can enroll and give a baseline now, and start the weeks once you&rsquo;ve gathered everything.
             </p>
           </div>
         </div>
