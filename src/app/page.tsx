@@ -179,26 +179,11 @@ function SiteFooter() {
 
 function EnrollCTA({ open }: { open: boolean | null }) {
   if (open === null) return <div style={{ height: 52 }} />;
-  if (!open) return (
-    <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
-      <span style={{ fontFamily: SERIF, fontSize: 16, color: C.inkSoft, fontStyle: "italic" }}>
-        Enrollment opens by Friday — check back soon.
-      </span>
-      <Link href="/before-you-begin"
-            style={{ fontFamily: MONO, fontSize: 13, color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>
-        I already have a code →
-      </Link>
-    </div>
-  );
   return (
-    <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
+    <div>
       <Link href="/before-you-begin"
             style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "14px 28px", textDecoration: "none", display: "inline-block" }}>
         Learn more and enroll →
-      </Link>
-      <Link href="/before-you-begin"
-            style={{ fontFamily: MONO, fontSize: 13, color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>
-        I already have a code →
       </Link>
     </div>
   );
