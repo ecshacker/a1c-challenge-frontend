@@ -1,6 +1,7 @@
 ﻿"use client"; // Required at the very top since your views track local states via hooks
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 /**
@@ -32,7 +33,7 @@ function Sect({ n, title, summary, children, open, onToggle }: { n: string; titl
         <span style={{ fontFamily: MONO, fontSize: 13, color: C.card, background: C.accent, width: 24, height: 24, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>{n}</span>
         <span style={{ flex: 1 }}>
           <span style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 700, color: C.ink }}>{title}</span>
-          <span style={{ display: "block", fontFamily: SERIF, fontSize: 14.5, color: C.inkSoft, marginTop: 3 }}>{summary}</span>
+          <span style={{ display: "block", fontFamily: SERIF, fontSize: 15.5, color: C.inkSoft, marginTop: 3 }}>{summary}</span>
         </span>
         <span style={{ fontFamily: MONO, fontSize: 18, color: C.inkFaint, lineHeight: 1 }}>{open ? "–" : "+"}</span>
       </button>
@@ -47,8 +48,8 @@ function Look({ points }: { points: string[] }) {
       <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 9 }}>What to look for</div>
       {points.map((p, i) => (
         <div key={i} style={{ display: "flex", gap: 9, marginBottom: 10 }}>
-          <span style={{ color: C.accent, fontFamily: MONO, fontSize: 14, lineHeight: 1.5 }}>·</span>
-          <span style={{ fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.55, color: C.inkSoft }}>{p}</span>
+          <span style={{ color: C.accent, fontFamily: MONO, fontSize: 16, lineHeight: 1.6 }}>·</span>
+          <span style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft }}>{p}</span>
         </div>
       ))}
     </div>
@@ -59,7 +60,7 @@ function Where({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.lineSoft}` }}>
       <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 7 }}>Where to find it</div>
-      <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: C.inkSoft, margin: 0 }}>{children}</p>
+      <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: 0 }}>{children}</p>
     </div>
   );
 }
@@ -70,12 +71,12 @@ function Caveat({ children, tone }: { children: React.ReactNode; tone: "legal" |
   return (
     <div style={{ margin: "14px 0", padding: "12px 14px", background: bg, border: `1px solid ${col}`, borderRadius: 6 }}>
       <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.12em", textTransform: "uppercase", color: col, marginBottom: 6 }}>{tone === "legal" ? "On legality" : "On testing"}</div>
-      <p style={{ fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.55, color: C.inkSoft, margin: 0 }}>{children}</p>
+      <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: 0 }}>{children}</p>
     </div>
   );
 }
 
-const body = { fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 14px" };
+const body = { fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 14px" };
 const bold = { color: C.ink, fontWeight: 700 };
 
 export default function GettingSetUpPage() {
@@ -87,37 +88,14 @@ export default function GettingSetUpPage() {
 
   // Return root JSX element
   return (
-      <div style={{
-        background: C.pageBg,
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        color: C.ink,
-        overflow: "hidden"
-      }} className="a1c-root">
-<div style={{flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch"}}>
-          <div style={{maxWidth: 560, margin: "0 auto", padding: "24px 22px 28px"}}>
-          <span style={{
-            fontFamily: MONO,
-            fontSize: 11,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            color: C.inkSoft
-          }}>
+      <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink }} className="a1c-root">
+      <div>
+          <div style={{maxWidth: 560, margin: "0 auto", padding: "24px 22px 64px"}}>
+          <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft }}>
             Getting set up ·{" "}
-            <button className="a1c-link" onClick={() => setToast("← Before you begin")} style={{
-              fontFamily: MONO,
-              fontSize: 11,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: C.accentDeep,
-              background: "none",
-              border: "none",
-              padding: 0,
-              cursor: "pointer"
-            }}>
+            <Link href="/before-you-begin" style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: C.accentDeep, textDecoration: "none" }}>
               The A1C Challenge ↩
-            </button>
+            </Link>
           </span>
 
             <h1 style={{
@@ -150,7 +128,7 @@ export default function GettingSetUpPage() {
                       alignItems: "center",
                       gap: 10
                     }}>
-              <span style={{fontFamily: SERIF, fontSize: 14.5, color: C.inkSoft}}>This guidance is general. Set where you are for what applies locally.</span>
+              <span style={{fontFamily: SERIF, fontSize: 16, color: C.inkSoft}}>This guidance is general. Set where you are for what applies locally.</span>
               <span style={{
                 fontFamily: MONO,
                 fontSize: 12,
@@ -264,7 +242,7 @@ export default function GettingSetUpPage() {
               position: "fixed",
               left: "50%",
               transform: "translateX(-50%)",
-              bottom: 92,
+              bottom: 28,
               background: C.ink,
               color: C.card,
               fontFamily: MONO,
