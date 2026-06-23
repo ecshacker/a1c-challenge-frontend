@@ -28,7 +28,7 @@ export default function TermsPage() {
           Terms &amp; Disclosures
         </h1>
         <p style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, margin: "0 0 4px" }}>
-          Effective date: June 2025 · Last updated: June 2025
+          Effective date: June 2026 · Last updated: June 2026
         </p>
 
         {/* Competing interests — front and center */}
