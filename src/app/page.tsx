@@ -1,9 +1,181 @@
 ﻿"use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { C, SERIF, MONO } from "@/lib/theme";
+
+const SITE_URL = "https://a1c-challenge.org";
+const SHARE_TEXT = "The A1C Challenge — a shared, open look at whether hemp seed and raw cannabis flower shift blood-sugar control over four weeks.";
+
+/* ---- icon paths ---- */
+function IconFacebook() {
+  return (
+    <svg viewBox="0 0 24 24" width={18} height={18} fill="currentColor" aria-hidden>
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+    </svg>
+  );
+}
+function IconLinkedIn() {
+  return (
+    <svg viewBox="0 0 24 24" width={18} height={18} fill="currentColor" aria-hidden>
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+      <rect x="2" y="9" width="4" height="12"/>
+      <circle cx="4" cy="4" r="2"/>
+    </svg>
+  );
+}
+function IconInstagram() {
+  return (
+    <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+    </svg>
+  );
+}
+function IconTikTok() {
+  return (
+    <svg viewBox="0 0 24 24" width={18} height={18} fill="currentColor" aria-hidden>
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.89a8.18 8.18 0 0 0 4.84 1.55V7a4.85 4.85 0 0 1-1.07-.31z"/>
+    </svg>
+  );
+}
+function IconOSF() {
+  return (
+    <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+      <circle cx="12" cy="12" r="9"/>
+      <text x="12" y="16" textAnchor="middle" fontSize="7" fontWeight="700" fill="currentColor" stroke="none" fontFamily="ui-monospace,monospace">OSF</text>
+    </svg>
+  );
+}
+function IconZenodo() {
+  return (
+    <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="3" y="3" width="18" height="18" rx="3"/>
+      <text x="12" y="16.5" textAnchor="middle" fontSize="10" fontWeight="800" fill="currentColor" stroke="none" fontFamily="ui-monospace,monospace">Z</text>
+    </svg>
+  );
+}
+function IconDocument() {
+  return (
+    <svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+    </svg>
+  );
+}
+
+function IconBtn({ label, href, onClick, children }: {
+  label: string;
+  href?: string;
+  onClick?: () => void;
+  children: React.ReactNode;
+}) {
+  const style: React.CSSProperties = {
+    display: "inline-flex", alignItems: "center", justifyContent: "center",
+    width: 34, height: 34, borderRadius: 6,
+    color: C.inkFaint, background: "none", border: "none",
+    cursor: "pointer", textDecoration: "none",
+    transition: "color 0.15s, background 0.15s",
+  };
+  if (href) return (
+    <a href={href} target="_blank" rel="noopener noreferrer" title={label} aria-label={label} style={style}
+       onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = C.accentDeep; (e.currentTarget as HTMLElement).style.background = C.accentTint; }}
+       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = C.inkFaint; (e.currentTarget as HTMLElement).style.background = "none"; }}>
+      {children}
+    </a>
+  );
+  return (
+    <button onClick={onClick} title={label} aria-label={label} style={style}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = C.accentDeep; (e.currentTarget as HTMLElement).style.background = C.accentTint; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = C.inkFaint; (e.currentTarget as HTMLElement).style.background = "none"; }}>
+      {children}
+    </button>
+  );
+}
+
+function SiteFooter() {
+  const [shareToast, setShareToast] = useState("");
+
+  const flashToast = useCallback((msg: string) => {
+    setShareToast(msg);
+    setTimeout(() => setShareToast(""), 2600);
+  }, []);
+
+  const copyShare = useCallback(async (platform: string) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "The A1C Challenge", text: SHARE_TEXT, url: SITE_URL });
+        return;
+      } catch { /* user cancelled or not supported */ }
+    }
+    try {
+      await navigator.clipboard.writeText(SITE_URL);
+      flashToast(`Link copied — share on ${platform}`);
+    } catch {
+      flashToast("Copy the link: " + SITE_URL);
+    }
+  }, [flashToast]);
+
+  return (
+    <div style={{ marginTop: 48, paddingTop: 20, borderTop: `1px solid ${C.line}` }}>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
+
+        {/* Left: identity + terms */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <span style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkFaint }}>
+            The A1C Challenge · a1c-challenge.org
+          </span>
+          <Link href="/terms" title="Terms & Disclosures"
+                style={{ display: "inline-flex", alignItems: "center", gap: 4, fontFamily: MONO, fontSize: 12, color: C.inkFaint, textDecoration: "none" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = C.accentDeep)}
+                onMouseLeave={(e) => (e.currentTarget.style.color = C.inkFaint)}>
+            <IconDocument /> Terms
+          </Link>
+        </div>
+
+        {/* Right: icon groups */}
+        <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {/* Share icons */}
+          <IconBtn label="Share on Facebook"
+            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`}>
+            <IconFacebook />
+          </IconBtn>
+          <IconBtn label="Share on LinkedIn"
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SITE_URL)}`}>
+            <IconLinkedIn />
+          </IconBtn>
+          <IconBtn label="Share on Instagram" onClick={() => copyShare("Instagram")}>
+            <IconInstagram />
+          </IconBtn>
+          <IconBtn label="Share on TikTok" onClick={() => copyShare("TikTok")}>
+            <IconTikTok />
+          </IconBtn>
+
+          {/* Divider */}
+          <span style={{ width: 1, height: 20, background: C.line, margin: "0 6px", display: "inline-block" }} />
+
+          {/* Study links */}
+          <IconBtn label="Study pre-registration (OSF)" href="https://osf.io/r4ufg/overview">
+            <IconOSF />
+          </IconBtn>
+          <IconBtn label="Open dataset (Zenodo)" href="https://zenodo.org/records/20653093">
+            <IconZenodo />
+          </IconBtn>
+        </div>
+      </div>
+
+      {shareToast && (
+        <div style={{ marginTop: 10, fontFamily: MONO, fontSize: 12.5, color: C.inkSoft, textAlign: "right" }}>
+          {shareToast}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function EnrollCTA({ open }: { open: boolean | null }) {
   if (open === null) return <div style={{ height: 52 }} />;
@@ -175,21 +347,7 @@ export default function LandingPage() {
         </div>
 
         {/* Footer */}
-        <div style={{ marginTop: 48, paddingTop: 24, borderTop: `1px solid ${C.line}`, display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "space-between", alignItems: "baseline" }}>
-          <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint }}>
-            The A1C Challenge · a1c-challenge.org
-          </div>
-          <div style={{ display: "flex", gap: 18 }}>
-            <a className="a1c-link" href="https://osf.io/r4ufg/overview" target="_blank" rel="noopener noreferrer"
-               style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, textDecoration: "none" }}>
-              Study spec (OSF)
-            </a>
-            <a className="a1c-link" href="https://zenodo.org/records/20653093" target="_blank" rel="noopener noreferrer"
-               style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, textDecoration: "none" }}>
-              Dataset (Zenodo)
-            </a>
-          </div>
-        </div>
+        <SiteFooter />
       </div>
     </div>
   );
