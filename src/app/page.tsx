@@ -177,16 +177,8 @@ function SiteFooter() {
   );
 }
 
-function EnrollCTA({ open }: { open: boolean | null }) {
-  if (open === null) return <div style={{ height: 52 }} />;
-  return (
-    <div>
-      <Link href="/before-you-begin"
-            style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "14px 28px", textDecoration: "none", display: "inline-block" }}>
-        Learn more and enroll →
-      </Link>
-    </div>
-  );
+function EnrollCTA() {
+  return null;
 }
 
 function EnrollCard({ open }: { open: boolean | null }) {
@@ -210,7 +202,7 @@ function EnrollCard({ open }: { open: boolean | null }) {
       </p>
       <Link href="/before-you-begin"
             style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "14px 32px", textDecoration: "none", display: "inline-block" }}>
-        Begin enrollment →
+        Learn more and enroll →
       </Link>
     </div>
   );
@@ -278,7 +270,7 @@ export default function LandingPage() {
           <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 32px", maxWidth: 580 }}>
             When hemp seed and raw cannabis flower are eaten as food — raw, the flower never heated — does blood-sugar control shift over four weeks? This study asks that question in the open, with every record available for anyone to examine.
           </p>
-          <EnrollCTA open={studyOpen} />
+          <EnrollCTA />
         </div>
       </div>
 
