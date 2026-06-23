@@ -183,23 +183,20 @@ function EnrollCTA() {
 
 function EnrollCard({ open }: { open: boolean | null }) {
   if (open === null) return <div style={{ height: 48 }} />;
-  if (!open) return (
-    <div style={{ textAlign: "center" }}>
-      <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 26, color: C.ink, marginBottom: 12 }}>Ready to take part?</div>
-      <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 16px" }}>
-        Enrollment opens by Friday. Check back soon — or{" "}
-        <Link href="/before-you-begin" style={{ color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>enter your code</Link>
-        {" "}if you already have one.
-      </p>
-    </div>
-  );
   return (
     <div style={{ textAlign: "center" }}>
       <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 26, color: C.ink, marginBottom: 12 }}>Ready to take part?</div>
-      <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 24px" }}>
-        No name. No email. You get a code — that&rsquo;s your whole identity here.<br />
-        Enroll now; start the weeks once you&rsquo;ve sourced everything.
-      </p>
+      {!open && (
+        <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 20px" }}>
+          Enrollment opens by Friday — check back soon.
+        </p>
+      )}
+      {open && (
+        <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 24px" }}>
+          No name. No email. You get a code — that&rsquo;s your whole identity here.<br />
+          Enroll now; start the weeks once you&rsquo;ve sourced everything.
+        </p>
+      )}
       <Link href="/before-you-begin"
             style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "14px 32px", textDecoration: "none", display: "inline-block" }}>
         Learn more and enroll →
