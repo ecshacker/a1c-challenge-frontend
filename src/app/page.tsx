@@ -254,10 +254,10 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink }}>
+    <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink, overflowX: "hidden" }}>
 {/* Hero */}
       <div style={{ borderBottom: `1px solid ${C.line}`, background: C.card }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "28px 18px 24px" }}>
+        <div style={{ maxWidth: 680, width: "100%", margin: "0 auto", padding: "28px 18px 24px", boxSizing: "border-box" }}>
           <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft, marginBottom: 14 }}>
             The A1C Challenge
           </div>
