@@ -260,17 +260,16 @@ export default function LandingPage() {
     <div style={{ background: C.pageBg, minHeight: "100vh", color: C.ink }}>
 {/* Hero */}
       <div style={{ borderBottom: `1px solid ${C.line}`, background: C.card }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "48px 24px 44px" }}>
-          <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft, marginBottom: 18 }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "28px 24px 24px" }}>
+          <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.18em", textTransform: "uppercase", color: C.inkSoft, marginBottom: 14 }}>
             The A1C Challenge
           </div>
-          <h1 style={{ fontFamily: SERIF, fontWeight: 800, fontSize: "clamp(34px, 6vw, 52px)", lineHeight: 1.07, letterSpacing: "-0.02em", margin: "0 0 22px", color: C.ink }}>
+          <h1 style={{ fontFamily: SERIF, fontWeight: 800, fontSize: "clamp(34px, 6vw, 52px)", lineHeight: 1.07, letterSpacing: "-0.02em", margin: "0 0 18px", color: C.ink }}>
             A shared, open look at blood-sugar control
           </h1>
-          <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 32px", maxWidth: 580 }}>
+          <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: C.inkSoft, margin: 0 }}>
             When hemp seed and raw cannabis flower are eaten as food — raw, the flower never heated — does blood-sugar control shift over four weeks? This study asks that question in the open, with every record available for anyone to examine.
           </p>
-          <EnrollCTA />
         </div>
       </div>
 
