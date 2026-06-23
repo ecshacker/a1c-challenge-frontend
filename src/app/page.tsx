@@ -210,7 +210,7 @@ function EnrollCard({ open }: { open: boolean | null }) {
     <div style={{ textAlign: "center" }}>
       <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 26, color: C.ink, marginBottom: 12 }}>Ready to take part?</div>
       <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 16px" }}>
-        Enrollment isn&rsquo;t open yet. Check back soon — or{" "}
+        Enrollment opens by Friday. Check back soon — or{" "}
         <Link href="/before-you-begin" style={{ color: C.accentDeep, textDecoration: "none", fontWeight: 600 }}>enter your code</Link>
         {" "}if you already have one.
       </p>
