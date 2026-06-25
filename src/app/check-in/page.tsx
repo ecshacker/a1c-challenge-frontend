@@ -650,6 +650,7 @@ export default function WeeklyCheckInPage() {
       setDone(true);
     } catch (err) {
       if (err instanceof ApiError) {
+        if (err.details) console.error("Check-in validation details:", err.details);
         setToast(err.status === 409 ? "This week has already been submitted." : err.error);
       } else {
         setToast("Submit failed — please try again.");
