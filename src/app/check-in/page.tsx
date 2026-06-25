@@ -16,7 +16,8 @@ const WELLBEING = [
   { id: "comfort",   label: "Comfort",   low: "in pain", high: "at ease" },
 ];
 
-const FRUCT_TEST_MAP: Record<string, string> = { "Lab": "lab", "Home kit": "home_kit", "Clinic": "clinic" };
+const FRUCT_TEST_MAP: Record<string, string>    = { "Lab": "lab", "Home kit": "home_kit", "Clinic": "clinic" };
+const FRUCT_REVERSE: Record<string, string>     = { "lab": "Lab", "home_kit": "Home kit", "clinic": "Clinic" };
 const CANN_METHOD_MAP: Record<string, string> = { "Juice / smoothie": "juice_smoothie", "Eaten directly": "eaten_directly", "Cold infusion": "cold_infusion", "Mixed": "mixed", "None this week": "none_this_week" };
 const CANN_STRAIN_MAP: Record<string, string> = { "Sativa": "sativa", "Indica": "indica", "Balanced": "balanced", "Not selected": "not_selected" };
 const EXERCISE_DAYS_MAP: Record<string, string> = { "Zero": "zero", "1–2 days": "1to2", "3–4 days": "3to4", "5+ days": "5plus" };
@@ -250,11 +251,21 @@ function dayStyle(v: boolean | null) {
   return                  { background: C.card,        color: C.inkFaint, border: `1px dashed ${C.line}`,    textDecoration: "none" };
 }
 
-function IntakeRow({ title, hint, days, onTap, had, not, unanswered, amount, setAmount, echo }: {
+function IntakeRow({ title, hint, days, onTap, had, not, unanswered, amount, setAmount, echo, step = 1 }: {
   title: string; hint: string; days: (boolean | null)[]; onTap: (i: number) => void;
   had: number; not: number; unanswered: number;
-  amount: string; setAmount: (v: string) => void; echo?: string;
+  amount: string; setAmount: (v: string) => void; echo?: string; step?: number;
 }) {
+  const spinBtn: React.CSSProperties = {
+    fontFamily: MONO, fontSize: 18, width: 36, height: 36, border: `1px solid ${C.line}`,
+    borderRadius: 4, background: C.card, color: C.inkSoft, cursor: "pointer", display: "flex",
+    alignItems: "center", justifyContent: "center", flexShrink: 0,
+  };
+  const adjust = (delta: number) => {
+    const cur = parseFloat(amount) || 0;
+    const next = Math.max(0, Math.round((cur + delta) * 10) / 10);
+    setAmount(String(next));
+  };
   return (
     <div style={{ marginBottom: 22 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
@@ -272,10 +283,14 @@ function IntakeRow({ title, hint, days, onTap, had, not, unanswered, amount, set
       <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, marginTop: 8 }}>
         {had} had · {not} not{unanswered > 0 ? ` · ${unanswered} to answer` : ""}
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 12, flexWrap: "wrap" }}>
         <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkSoft }}>about how much per day</span>
-        <input inputMode="decimal" value={amount} onChange={(e) => setAmount(dec1(e.target.value))} placeholder="—"
-               style={{ fontFamily: MONO, fontSize: 15, width: 60, padding: "8px 10px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <button style={spinBtn} onClick={() => adjust(-step)} aria-label={`Decrease by ${step}`}>−</button>
+          <input inputMode="decimal" value={amount} onChange={(e) => setAmount(dec1(e.target.value))} placeholder="—"
+                 style={{ fontFamily: MONO, fontSize: 15, width: 60, padding: "8px 10px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink, textAlign: "center" }} />
+          <button style={spinBtn} onClick={() => adjust(step)} aria-label={`Increase by ${step}`}>+</button>
+        </div>
         <span style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint }}>g</span>
         {echo && <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>{echo}</span>}
       </div>
@@ -489,7 +504,7 @@ export default function WeeklyCheckInPage() {
         setBaselineEditable(p.baselineEditable);
         setBaseA1c(p.baselineA1c ? String(p.baselineA1c) : "");
         setBaseFruct(p.baselineFructosamine ? String(p.baselineFructosamine) : "");
-        setBaseFructHow(p.baselineFructosamineTestType ?? "");
+        setBaseFructHow(FRUCT_REVERSE[p.baselineFructosamineTestType ?? ""] ?? "");
         setBaseWeight(p.weightValue ? String(p.weightValue) : "");
         setBaseUnit(p.weightUnit ?? "kg");
         setBaseHeight(p.heightValue ? String(p.heightValue) : "");
@@ -747,7 +762,7 @@ export default function WeeklyCheckInPage() {
                 tap a day to cycle · <span style={{ color: C.accentDeep }}>had it</span> → <span style={{ textDecoration: "line-through" }}>didn&rsquo;t</span> → clear
               </div>
               <IntakeRow title="Hemp seed" hint={self ? `your amount · ${self.baselineA1c ? "" : ""}` : ""} days={hemp} onTap={(i) => tapDay(hemp, setHemp, i)} had={had(hemp)} not={not(hemp)} unanswered={7 - hempAnswered}
-                         amount={hempAmt} setAmount={setHempAmt} echo={parseFloat(hempAmt) ? `≈ ${(parseFloat(hempAmt) / 10).toFixed(1)} tbsp` : "1 tbsp ≈ 10 g"} />
+                         amount={hempAmt} setAmount={setHempAmt} echo={parseFloat(hempAmt) ? `≈ ${(parseFloat(hempAmt) / 10).toFixed(1)} tbsp` : "1 tbsp ≈ 10 g"} step={10} />
               <IntakeRow title="Raw cannabis flower" hint="aim · at least 1 g/day, raw" days={cannabis} onTap={(i) => tapDay(cannabis, setCannabis, i)} had={had(cannabis)} not={not(cannabis)} unanswered={7 - cannAnswered}
                          amount={cannAmt} setAmount={setCannAmt} />
               <div style={{ height: 1, background: C.lineSoft, margin: "24px 0 16px" }} />
