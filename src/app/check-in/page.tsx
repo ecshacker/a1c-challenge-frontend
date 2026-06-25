@@ -17,6 +17,12 @@ const WELLBEING = [
 ];
 
 const FRUCT_TEST_MAP: Record<string, string> = { "Lab": "lab", "Home kit": "home_kit", "Clinic": "clinic" };
+const CANN_METHOD_MAP: Record<string, string> = { "Juice / smoothie": "juice_smoothie", "Eaten directly": "eaten_directly", "Cold infusion": "cold_infusion", "Mixed": "mixed", "None this week": "none_this_week" };
+const CANN_STRAIN_MAP: Record<string, string> = { "Sativa": "sativa", "Indica": "indica", "Balanced": "balanced", "Not selected": "not_selected" };
+const EXERCISE_DAYS_MAP: Record<string, string> = { "Zero": "zero", "1–2 days": "1to2", "3–4 days": "3to4", "5+ days": "5plus" };
+const EXERCISE_TYPE_MAP: Record<string, string> = { "Aerobic": "aerobic", "Resistance": "resistance", "Walking": "walking", "Mixed": "mixed", "None": "none" };
+const MED_CHANGE_MAP: Record<string, string> = { "No changes": "no_changes", "Dose reduced": "dose_reduced", "Medication stopped": "medication_stopped", "New med added": "new_med_added" };
+const STD_CARE_MAP: Record<string, string> = { "No": "no", "Scheduled visit": "yes_scheduled_visit", "Lab A1C": "yes_lab_a1c", "Other": "yes_other" };
 
 // Returns ISO day of week: 1=Mon … 7=Sun
 function todayDayOffset(): number {
@@ -36,6 +42,67 @@ function dec1(s: string): string {
 }
 
 /* ---- sub-components ---- */
+
+function PickRow({ label, value, set, opts }: { label: string; value: string; set: (v: string) => void; opts: string[] }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkSoft, marginBottom: 7 }}>{label}</div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {opts.map((o) => {
+          const on = value === o;
+          return (
+            <button key={o} onClick={() => set(on ? "" : o)}
+                    style={{ fontFamily: MONO, fontSize: 13, padding: "7px 11px", cursor: "pointer", borderRadius: 4, background: on ? C.accent : C.card, color: on ? C.card : C.inkSoft, border: `1px solid ${on ? C.accent : C.line}` }}>
+              {o}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ExpandGroup({ label, show, onToggle, children }: { label: string; show: boolean; onToggle: () => void; children: React.ReactNode }) {
+  return (
+    <div style={{ borderTop: `1px solid ${C.lineSoft}`, marginBottom: 2 }}>
+      <button onClick={onToggle} style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: "11px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.08em", color: C.inkFaint }}>{label}</span>
+        <span style={{ fontFamily: MONO, fontSize: 16, color: C.inkFaint, lineHeight: 1 }}>{show ? "−" : "+"}</span>
+      </button>
+      {show && <div className="a1c-fade" style={{ paddingBottom: 14 }}>{children}</div>}
+    </div>
+  );
+}
+
+function GlucoseGrid({ days, setDays, unit, setUnit }: { days: string[]; setDays: (v: string[]) => void; unit: string; setUnit: (v: string) => void }) {
+  return (
+    <>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+        <span style={{ fontFamily: MONO, fontSize: 13, color: C.inkSoft }}>Unit</span>
+        <div style={{ display: "flex", border: `1px solid ${C.line}`, borderRadius: 4, overflow: "hidden" }}>
+          {[["mgdl", "mg/dL"], ["mmoll", "mmol/L"]].map(([val, lbl]) => (
+            <button key={val} onClick={() => setUnit(val)} style={{ fontFamily: MONO, fontSize: 13, padding: "7px 12px", border: "none", cursor: "pointer", background: unit === val ? C.accent : C.card, color: unit === val ? C.card : C.inkSoft }}>
+              {lbl}
+            </button>
+          ))}
+        </div>
+        <span style={{ fontFamily: SERIF, fontSize: 13, color: C.inkFaint }}>fasting readings</span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 5 }}>
+        {DAY_LETTERS.map((d, i) => (
+          <div key={i} style={{ textAlign: "center" }}>
+            <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginBottom: 4 }}>{d}</div>
+            <input inputMode="decimal" value={days[i]}
+                   onChange={(e) => { const n = [...days]; n[i] = dec1(e.target.value); setDays(n); }}
+                   placeholder="—"
+                   style={{ width: "100%", boxSizing: "border-box", fontFamily: MONO, fontSize: 13, padding: "7px 3px", textAlign: "center", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
+          </div>
+        ))}
+      </div>
+      <div style={{ fontFamily: SERIF, fontSize: 13, color: C.inkFaint, marginTop: 7 }}>Leave blank for days not measured.</div>
+    </>
+  );
+}
 
 function StartingNumbers({
   self, editable, a1c, setA1c, fruct, setFruct, fructHow, setFructHow,
@@ -370,6 +437,30 @@ export default function WeeklyCheckInPage() {
   const [submitting,   setSubmitting]   = useState(false);
   const [warnings,     setWarnings]     = useState<string[]>([]);
 
+  // cannabis extras
+  const [cannMethod,   setCannMethod]   = useState("");
+  const [cannStrain,   setCannStrain]   = useState("");
+  // daily glucose
+  const [glucoseUnit,  setGlucoseUnit]  = useState("mgdl");
+  const [glucoseDays,  setGlucoseDays]  = useState<string[]>(Array(7).fill(""));
+  // CGM
+  const [cgmTir,       setCgmTir]       = useState("");
+  const [cgmTar,       setCgmTar]       = useState("");
+  const [cgmTbr,       setCgmTbr]       = useState("");
+  const [cgmCv,        setCgmCv]        = useState("");
+  // exercise
+  const [exDays,       setExDays]       = useState("");
+  const [exType,       setExType]       = useState("");
+  // clinical
+  const [medChange,    setMedChange]    = useState("");
+  const [stdCare,      setStdCare]      = useState("");
+  // expand/collapse
+  const [showCann,     setShowCann]     = useState(false);
+  const [showGlucose,  setShowGlucose]  = useState(false);
+  const [showCgm,      setShowCgm]      = useState(false);
+  const [showExercise, setShowExercise] = useState(false);
+  const [showClinical, setShowClinical] = useState(false);
+
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isWeek1 = studyWeek === 1;
@@ -412,14 +503,26 @@ export default function WeeklyCheckInPage() {
       .then((draft) => {
         if (!draft) return;
         const d = (draft as { draftData: Record<string, unknown> }).draftData;
-        if (d.hemp)     setHemp(d.hemp as (boolean | null)[]);
-        if (d.cannabis) setCannabis(d.cannabis as (boolean | null)[]);
-        if (d.hempAmt)  setHempAmt(String(d.hempAmt));
-        if (d.cannAmt)  setCannAmt(String(d.cannAmt));
-        if (d.wb)       setWb(d.wb as Record<string, number>);
-        if (d.weight)   setWeight(String(d.weight));
-        if (d.unit)     setUnit(d.unit as string);
-        if (d.note)     setNote(d.note as string);
+        if (d.hemp)        setHemp(d.hemp as (boolean | null)[]);
+        if (d.cannabis)    setCannabis(d.cannabis as (boolean | null)[]);
+        if (d.hempAmt)     setHempAmt(String(d.hempAmt));
+        if (d.cannAmt)     setCannAmt(String(d.cannAmt));
+        if (d.cannMethod)  setCannMethod(d.cannMethod as string);
+        if (d.cannStrain)  setCannStrain(d.cannStrain as string);
+        if (d.glucoseUnit) setGlucoseUnit(d.glucoseUnit as string);
+        if (d.glucoseDays) setGlucoseDays(d.glucoseDays as string[]);
+        if (d.cgmTir)      setCgmTir(String(d.cgmTir));
+        if (d.cgmTar)      setCgmTar(String(d.cgmTar));
+        if (d.cgmTbr)      setCgmTbr(String(d.cgmTbr));
+        if (d.cgmCv)       setCgmCv(String(d.cgmCv));
+        if (d.wb)          setWb(d.wb as Record<string, number>);
+        if (d.weight)      setWeight(String(d.weight));
+        if (d.unit)        setUnit(d.unit as string);
+        if (d.exDays)      setExDays(d.exDays as string);
+        if (d.exType)      setExType(d.exType as string);
+        if (d.medChange)   setMedChange(d.medChange as string);
+        if (d.stdCare)     setStdCare(d.stdCare as string);
+        if (d.note)        setNote(d.note as string);
       })
       .catch((err) => {
         if (err instanceof ApiError && err.status === 404) return; // no draft yet — fine
@@ -441,9 +544,9 @@ export default function WeeklyCheckInPage() {
     api.post("/checkins/draft", {
       studyWeek,
       lastSavedOffset: todayDayOffset(),
-      draftData: { hemp, cannabis, hempAmt, cannAmt, wb, weight, unit, note },
+      draftData: { hemp, cannabis, hempAmt, cannAmt, cannMethod, cannStrain, glucoseUnit, glucoseDays, cgmTir, cgmTar, cgmTbr, cgmCv, wb, weight, unit, exDays, exType, medChange, stdCare, note },
     }).catch(() => { /* silent — draft save is best-effort */ });
-  }, [token, studyWeek, hemp, cannabis, hempAmt, cannAmt, wb, weight, unit, note]);
+  }, [token, studyWeek, hemp, cannabis, hempAmt, cannAmt, cannMethod, cannStrain, glucoseUnit, glucoseDays, cgmTir, cgmTar, cgmTbr, cgmCv, wb, weight, unit, exDays, exType, medChange, stdCare, note]);
 
   useEffect(() => {
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
@@ -497,7 +600,25 @@ export default function WeeklyCheckInPage() {
         hempAmountG:    hempAmt ? parseFloat(hempAmt) : null,
         cannabisDayMon: cannabis[0], cannabisDayTue: cannabis[1], cannabisDayWed: cannabis[2],
         cannabisDayThu: cannabis[3], cannabisDayFri: cannabis[4], cannabisDaySat: cannabis[5], cannabisDaySun: cannabis[6],
-        cannabisAmountG: cannAmt ? parseFloat(cannAmt) : null,
+        cannabisAmountG:      cannAmt ? parseFloat(cannAmt) : null,
+        cannabisMethod:       CANN_METHOD_MAP[cannMethod] ?? null,
+        cannabisStrainType:   CANN_STRAIN_MAP[cannStrain] ?? null,
+        glucoseUnit:          glucoseDays.some(v => v) ? glucoseUnit : null,
+        glucoseMon:           glucoseDays[0] ? parseFloat(glucoseDays[0]) : null,
+        glucoseTue:           glucoseDays[1] ? parseFloat(glucoseDays[1]) : null,
+        glucoseWed:           glucoseDays[2] ? parseFloat(glucoseDays[2]) : null,
+        glucoseThu:           glucoseDays[3] ? parseFloat(glucoseDays[3]) : null,
+        glucoseFri:           glucoseDays[4] ? parseFloat(glucoseDays[4]) : null,
+        glucoseSat:           glucoseDays[5] ? parseFloat(glucoseDays[5]) : null,
+        glucoseSun:           glucoseDays[6] ? parseFloat(glucoseDays[6]) : null,
+        cgmTirPct:            cgmTir ? parseFloat(cgmTir) : null,
+        cgmTarPct:            cgmTar ? parseFloat(cgmTar) : null,
+        cgmTbrPct:            cgmTbr ? parseFloat(cgmTbr) : null,
+        cgmCvPct:             cgmCv  ? parseFloat(cgmCv)  : null,
+        exerciseDays:         EXERCISE_DAYS_MAP[exDays] ?? null,
+        exerciseTypeThisWeek: EXERCISE_TYPE_MAP[exType] ?? null,
+        medicationChange:     MED_CHANGE_MAP[medChange] ?? null,
+        standardCareContact:  STD_CARE_MAP[stdCare] ?? null,
         wbEnergy:     wb.energy     ?? null,
         wbMood:       wb.mood       ?? null,
         wbDigestion:  wb.digestion  ?? null,
@@ -643,6 +764,56 @@ export default function WeeklyCheckInPage() {
                   ))}
                 </div>
                 <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>optional</span>
+              </div>
+
+              <div style={{ marginTop: 18 }}>
+                <ExpandGroup label="Cannabis — method &amp; strain" show={showCann} onToggle={() => setShowCann(s => !s)}>
+                  <PickRow label="How did you have it this week?" value={cannMethod} set={setCannMethod}
+                           opts={["Juice / smoothie", "Eaten directly", "Cold infusion", "Mixed", "None this week"]} />
+                  <PickRow label="Strain type (if known)" value={cannStrain} set={setCannStrain}
+                           opts={["Sativa", "Indica", "Balanced", "Not selected"]} />
+                </ExpandGroup>
+
+                <ExpandGroup label="Fasting glucose" show={showGlucose} onToggle={() => setShowGlucose(s => !s)}>
+                  <GlucoseGrid days={glucoseDays} setDays={setGlucoseDays} unit={glucoseUnit} setUnit={setGlucoseUnit} />
+                  {self?.glucoseMonitoringType === "cgm" && (
+                    <div style={{ marginTop: 14 }}>
+                      <ExpandGroup label="CGM metrics" show={showCgm} onToggle={() => setShowCgm(s => !s)}>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 4 }}>
+                          {([
+                            ["Time in Range", "70–180 · %", cgmTir, setCgmTir],
+                            ["Time Above Range", ">180 · %", cgmTar, setCgmTar],
+                            ["Time Below Range", "<70 · %", cgmTbr, setCgmTbr],
+                            ["CV", "target <36%", cgmCv, setCgmCv],
+                          ] as [string, string, string, (v: string) => void][]).map(([lbl, hint, val, set]) => (
+                            <div key={lbl}>
+                              <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginBottom: 5 }}>{lbl}</div>
+                              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                                <input inputMode="decimal" value={val} onChange={(e) => set(dec1(e.target.value))} placeholder="—"
+                                       style={{ fontFamily: MONO, fontSize: 15, width: 64, padding: "7px 8px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
+                                <span style={{ fontFamily: MONO, fontSize: 11, color: C.inkFaint }}>{hint}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </ExpandGroup>
+                    </div>
+                  )}
+                </ExpandGroup>
+
+                <ExpandGroup label="Exercise this week" show={showExercise} onToggle={() => setShowExercise(s => !s)}>
+                  <PickRow label="Days active" value={exDays} set={setExDays}
+                           opts={["Zero", "1–2 days", "3–4 days", "5+ days"]} />
+                  <PickRow label="Main type" value={exType} set={setExType}
+                           opts={["Aerobic", "Resistance", "Walking", "Mixed", "None"]} />
+                </ExpandGroup>
+
+                <ExpandGroup label="Clinical notes" show={showClinical} onToggle={() => setShowClinical(s => !s)}>
+                  <PickRow label="Medication or dose changes this week?" value={medChange} set={setMedChange}
+                           opts={["No changes", "Dose reduced", "Medication stopped", "New med added"]} />
+                  <PickRow label="Standard care contact this week?" value={stdCare} set={setStdCare}
+                           opts={["No", "Scheduled visit", "Lab A1C", "Other"]} />
+                </ExpandGroup>
               </div>
             </div>
           ) : (

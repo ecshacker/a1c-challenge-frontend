@@ -27,6 +27,9 @@ const WELLBEING = [
 // A1C test type — uses 'clinic_pharmacy', distinct from fructosamine's 'clinic'
 const A1C_TEST_MAP: Record<string, string> = { "Lab": "lab", "Home kit": "home_kit", "Clinic / pharmacy": "clinic_pharmacy" };
 const FRUCT_TEST_MAP: Record<string, string> = { "Lab": "lab", "Home kit": "home_kit", "Clinic": "clinic" };
+const ADHERENCE_MAP: Record<string, string> = { "Nearly every day": "nearly_every_day", "Most days (80–99%)": "most_days_80to99", "More than half": "more_than_half", "Struggled — under 50%": "struggled_under50" };
+const MED_CHANGE_MAP: Record<string, string> = { "No changes": "no_changes", "Reduced dose": "yes_reduced", "Stopped a medication": "yes_stopped", "Discussed with doctor": "discussed_with_doctor" };
+const WHAT_NEXT_MAP: Record<string, string> = { "Continue weekly": "continue_weekly", "Pause — do 8-week later": "pause_for_8week", "Done": "done" };
 
 function dec1(s: string): string {
   let v = s.replace(/[^0-9.]/g, "");
@@ -177,8 +180,8 @@ export default function MilestonePage() {
   const [fruct,        setFruct]      = useState("");
   const [fructHow,     setFructHow]   = useState("");
   const [wb,           setWb]         = useState<Record<string, number>>({});
-  const [adherence,    setAdherence]  = useState("");   // 0–100 (%)
-  const [medChange,    setMedChange]  = useState("");   // "yes" | "no" | "unsure"
+  const [adherenceLevel, setAdherenceLevel] = useState("");
+  const [medChange,    setMedChange]  = useState("");
   const [whatNext,     setWhatNext]   = useState("");
   const [noteText,     setNoteText]   = useState("");
   const [submitting,   setSubmitting] = useState(false);
@@ -211,7 +214,6 @@ export default function MilestonePage() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const medChangeMap: Record<string, boolean | null> = { yes: true, no: false, unsure: null };
       const payload: Record<string, unknown> = {
         milestoneType,
         milestoneA1c:             parseFloat(a1c),
@@ -224,9 +226,9 @@ export default function MilestonePage() {
         wbSleep:      wb.sleep      ?? null,
         wbHydration:  wb.hydration  ?? null,
         wbPain:       wb.comfort    ?? null,
-        selfReportedAdherence: adherence ? parseFloat(adherence) / 100 : null,
-        medicationChangeOverall: medChange ? (medChangeMap[medChange] ?? null) : null,
-        whatNext:      whatNext || null,
+        selfReportedAdherence:   ADHERENCE_MAP[adherenceLevel] ?? null,
+        medicationChangeOverall: MED_CHANGE_MAP[medChange] ?? null,
+        whatNext:      WHAT_NEXT_MAP[whatNext] ?? null,
         freeTextNote:  noteText || null,
       };
       const res = await api.post("/milestones", payload) as MilestoneResult;
@@ -418,26 +420,11 @@ export default function MilestonePage() {
           <div style={{ height: 1, background: C.lineSoft, margin: "18px 0 22px" }} />
           <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 16 }}>A couple of questions</div>
 
-          <PickRow label="Any medication or supplement changes over this stretch?" value={medChange} set={setMedChange} opts={["No", "Yes", "Not sure"]} />
+          <PickRow label="Medication or supplement changes over this stretch?" value={medChange} set={setMedChange} opts={["No changes", "Reduced dose", "Stopped a medication", "Discussed with doctor"]} />
 
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkSoft, marginBottom: 8 }}>
-              About what share of days would you say you had the hemp or cannabis as food?
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <input inputMode="decimal" value={adherence} onChange={(e) => setAdherence(dec1(e.target.value))} placeholder="—"
-                     style={{ fontFamily: MONO, fontSize: 16, width: 72, padding: "9px 11px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 5, color: C.ink }} />
-              <span style={{ fontFamily: MONO, fontSize: 15, color: C.inkSoft }}>%</span>
-              <span style={{ fontFamily: SERIF, fontSize: 13.5, color: C.inkFaint }}>of the time</span>
-            </div>
-          </div>
+          <PickRow label="About what share of days did you have the hemp or cannabis as food?" value={adherenceLevel} set={setAdherenceLevel} opts={["Nearly every day", "Most days (80–99%)", "More than half", "Struggled — under 50%"]} />
 
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkSoft, marginBottom: 8 }}>What are you thinking about doing next?</div>
-            <textarea value={whatNext} onChange={(e) => setWhatNext(e.target.value)} rows={2}
-                      placeholder="Keep going, try something different, nothing yet — whatever comes to mind."
-                      style={{ width: "100%", boxSizing: "border-box", fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, padding: "12px 14px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 5, color: C.ink, resize: "vertical" }} />
-          </div>
+          <PickRow label="What are you thinking about doing next?" value={whatNext} set={setWhatNext} opts={["Continue weekly", "Pause — do 8-week later", "Done"]} />
 
           <div style={{ marginBottom: 8 }}>
             <div style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkSoft, marginBottom: 8 }}>Anything else you want to record</div>

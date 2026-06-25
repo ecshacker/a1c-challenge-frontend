@@ -69,4 +69,5 @@ export interface ParticipantSelf {
   weightUnit:                   string | null;
   heightValue:                  number | null;
   heightUnit:                   string | null;
+  glucoseMonitoringType:        string | null;
 }
