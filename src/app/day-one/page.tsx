@@ -252,6 +252,15 @@ export default function StartDayOnePage() {
                     : "Your exposure clock starts Monday. Come back then to log your first week."}
                 </div>
               </div>
+              <div style={{ marginTop: 14, padding: "12px 15px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 7, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                <div>
+                  <div style={{ fontFamily: MONO, fontSize: 11.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 4 }}>Bookmark your check-in</div>
+                  <span style={{ fontFamily: MONO, fontSize: 14.5, color: C.accentDeep }}>a1c-challenge.org/check-in</span>
+                </div>
+                <a href="/check-in" style={{ fontFamily: SERIF, fontSize: 14.5, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "9px 18px", textDecoration: "none", whiteSpace: "nowrap" }}>
+                  Go to check-in →
+                </a>
+              </div>
               <ReminderStrip startLabel={existingStart} />
             </div>
           )}

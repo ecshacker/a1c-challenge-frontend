@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { api } from "@/lib/api";
+import { api, type ParticipantSelf } from "@/lib/api";
+import { getToken } from "@/lib/token";
 import { C, SERIF, MONO } from "@/lib/theme";
 
 const SITE_URL = "https://a1c-challenge.org";
@@ -177,6 +178,63 @@ function SiteFooter() {
   );
 }
 
+type ReturnState = "loading" | "none" | "no_start" | { future: string } | "active";
+
+function ParticipantBanner() {
+  const [state, setState] = useState<ReturnState>("loading");
+
+  useEffect(() => {
+    if (!getToken()) { setState("none"); return; }
+    api.get("/participants/me")
+      .then((d) => {
+        const p = d as ParticipantSelf;
+        if (!p.startDate) {
+          setState("no_start");
+        } else if (p.studyWeek == null || p.studyWeek < 1) {
+          setState({ future: p.startDate });
+        } else {
+          setState("active");
+        }
+      })
+      .catch(() => setState("none"));
+  }, []);
+
+  if (state === "loading" || state === "none") return null;
+
+  if (state === "active") {
+    return (
+      <div style={{ marginTop: 22 }}>
+        <Link href="/check-in"
+              style={{ display: "inline-block", fontFamily: SERIF, fontSize: 16, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "12px 26px", textDecoration: "none" }}>
+          You&rsquo;re back → Check in now
+        </Link>
+      </div>
+    );
+  }
+
+  if (typeof state === "object") {
+    const label = new Date(state.future + "T12:00:00").toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+    return (
+      <div style={{ marginTop: 22, padding: "13px 15px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 7, display: "inline-block" }}>
+        <div style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 5 }}>You&rsquo;re enrolled</div>
+        <div style={{ fontFamily: SERIF, fontSize: 15, color: C.ink }}>
+          Week 1 starts <strong>{label}</strong> — return then to check in.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginTop: 22, padding: "13px 15px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 7, display: "inline-block" }}>
+      <div style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 8 }}>You&rsquo;re enrolled</div>
+      <Link href="/day-one"
+            style={{ display: "inline-block", fontFamily: SERIF, fontSize: 15, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "10px 20px", textDecoration: "none" }}>
+        Set your start date →
+      </Link>
+    </div>
+  );
+}
+
 function EnrollCTA() {
   return null;
 }
@@ -267,6 +325,7 @@ export default function LandingPage() {
           <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: C.inkSoft, margin: 0 }}>
             When hemp seed and raw cannabis flower are eaten as food — raw, the flower never heated — does blood-sugar control shift over four weeks? This study asks that question in the open, with every record available for anyone to examine.
           </p>
+          <ParticipantBanner />
         </div>
       </div>
 
