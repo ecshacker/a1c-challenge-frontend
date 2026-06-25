@@ -139,6 +139,7 @@ const micro: React.CSSProperties = { fontFamily: SERIF, fontSize: 13.5, lineHeig
 const inp: React.CSSProperties   = { fontFamily: MONO, fontSize: 15.5, padding: "9px 11px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 5, color: C.ink };
 
 const FRUCT_TEST_MAP: Record<string, string> = { "Lab": "lab", "Home kit": "home_kit", "Clinic": "clinic" };
+const FRUCT_REVERSE: Record<string, string>  = { "lab": "Lab", "home_kit": "Home kit", "clinic": "Clinic" };
 
 export default function StartDayOnePage() {
   const router  = useRouter();
@@ -147,6 +148,7 @@ export default function StartDayOnePage() {
   const [start,         setStart]         = useState(0);
   const [fruct,         setFruct]         = useState("");
   const [fructHow,      setFructHow]      = useState("");
+  const [baselineA1c,   setBaselineA1c]   = useState<number | null>(null);
   const [toast,         setToast]         = useState("");
   const [loading,       setLoading]       = useState(false);
   const [error,         setError]         = useState<string | null>(null);
@@ -163,9 +165,10 @@ export default function StartDayOnePage() {
           setLocked(true);
         }
         setStudyWeek(p.studyWeek);
+        setBaselineA1c(p.baselineA1c ?? null);
         if (p.baselineFructosamine) {
           setFruct(String(p.baselineFructosamine));
-          setFructHow(p.baselineFructosamineTestType ?? "");
+          setFructHow(FRUCT_REVERSE[p.baselineFructosamineTestType ?? ""] ?? "");
         }
       })
       .catch(() => {});
@@ -188,8 +191,9 @@ export default function StartDayOnePage() {
     try {
       await api.patch("/participants/me", { startDate: mondays[start].iso });
 
-      if (fruct && fructHow) {
+      if (fruct && fructHow && baselineA1c !== null) {
         await api.patch("/participants/me/baseline", {
+          baselineA1c,
           baselineFructosamine:         parseFloat(fruct),
           baselineFructosamineTestType: FRUCT_TEST_MAP[fructHow] ?? fructHow,
         });
