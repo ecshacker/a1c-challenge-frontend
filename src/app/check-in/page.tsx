@@ -526,6 +526,7 @@ export default function WeeklyCheckInPage() {
       })
       .catch((err) => {
         if (err instanceof ApiError && err.status === 404) return; // no draft yet — fine
+        if (err instanceof ApiError && err.status === 400) return; // draft not available yet — proceed with blank form
         if (err instanceof ApiError && err.error !== "NO_TOKEN") {
           setMountError(err.error);
         }
