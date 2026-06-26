@@ -6,6 +6,8 @@ import { api, ApiError, type ParticipantSelf } from "@/lib/api";
 import { getToken } from "@/lib/token";
 import { C, SERIF, MONO } from "@/lib/theme";
 const DAY_LETTERS = ["M", "T", "W", "T", "F", "S", "S"];
+const SITE_URL    = "https://a1c-challenge.org";
+const SHARE_TEXT  = "The A1C Challenge — a shared, open look at whether hemp seed and raw cannabis flower shift blood-sugar control over four weeks.";
 
 const WELLBEING = [
   { id: "energy",    label: "Energy",    low: "low",     high: "high"    },
@@ -366,8 +368,9 @@ function ScaleRow({ label, low, high, value, onPick }: { label: string; low: str
 }
 
 function InfoTab() {
-  const [showCal, setShowCal] = useState(false);
-  const [calDay, setCalDay]   = useState(0);
+  const [showCal,    setShowCal]    = useState(false);
+  const [calDay,     setCalDay]     = useState(0);
+  const [shareToast, setShareToast] = useState("");
   const linkRef = useRef<HTMLAnchorElement>(null);
 
   const buildAndDownload = () => {
@@ -387,12 +390,89 @@ function InfoTab() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
+  const copyShare = async (platform: string) => {
+    if (navigator.share) {
+      try { await navigator.share({ title: "The A1C Challenge", text: SHARE_TEXT, url: SITE_URL }); return; }
+      catch { /* fallthrough to clipboard */ }
+    }
+    await navigator.clipboard.writeText(SITE_URL);
+    setShareToast(`Link copied — share on ${platform}`);
+    setTimeout(() => setShareToast(""), 2600);
+  };
+
+  const shareRowStyle: React.CSSProperties = {
+    display: "flex", alignItems: "center", gap: 12,
+    padding: "11px 0", borderBottom: `1px solid ${C.lineSoft}`,
+    textDecoration: "none", cursor: "pointer", background: "none", border: "none", width: "100%", textAlign: "left",
+  };
+  const iconWrap: React.CSSProperties = {
+    width: 32, height: 32, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center",
+    background: C.accentTint, color: C.accentDeep, flexShrink: 0,
+  };
+
   return (
     <div role="tabpanel" className="a1c-fade">
       <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 20px" }}>
         Hemp seed and raw flower are <strong style={{ color: C.ink, fontWeight: 700 }}>foods</strong> here — eaten as part of your day, raw, unless your clinician says otherwise. This check-in sheet waits for you: open it whenever suits your week.
       </p>
-      <div style={{ height: 1, background: C.lineSoft, margin: "0 0 18px" }} />
+
+      <div style={{ height: 1, background: C.lineSoft, margin: "0 0 20px" }} />
+
+      {/* Share section */}
+      <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, marginBottom: 18 }}>
+        Everyone knows someone. Help us get more participants by sharing with those you know. Just the link to the study, not your numbers.
+      </div>
+      <div style={{ marginBottom: 24 }}>
+        {/* Facebook */}
+        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`}
+           target="_blank" rel="noopener noreferrer" style={shareRowStyle}>
+          <span style={iconWrap}>
+            <svg viewBox="0 0 24 24" width={16} height={16} fill="currentColor" aria-hidden><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </span>
+          <span style={{ fontFamily: SERIF, fontSize: 16, color: C.ink, fontWeight: 600 }}>Facebook</span>
+        </a>
+        {/* LinkedIn */}
+        <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SITE_URL)}`}
+           target="_blank" rel="noopener noreferrer" style={shareRowStyle}>
+          <span style={iconWrap}>
+            <svg viewBox="0 0 24 24" width={16} height={16} fill="currentColor" aria-hidden>
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+              <rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+            </svg>
+          </span>
+          <span style={{ fontFamily: SERIF, fontSize: 16, color: C.ink, fontWeight: 600 }}>LinkedIn</span>
+        </a>
+        {/* Instagram */}
+        <button onClick={() => copyShare("Instagram")} style={shareRowStyle}>
+          <span style={iconWrap}>
+            <svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+            </svg>
+          </span>
+          <span style={{ fontFamily: SERIF, fontSize: 16, color: C.ink, fontWeight: 600 }}>Instagram</span>
+          <span style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginLeft: "auto" }}>copies link</span>
+        </button>
+        {/* TikTok */}
+        <button onClick={() => copyShare("TikTok")} style={shareRowStyle}>
+          <span style={iconWrap}>
+            <svg viewBox="0 0 24 24" width={16} height={16} fill="currentColor" aria-hidden>
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.89a8.18 8.18 0 0 0 4.84 1.55V7a4.85 4.85 0 0 1-1.07-.31z"/>
+            </svg>
+          </span>
+          <span style={{ fontFamily: SERIF, fontSize: 16, color: C.ink, fontWeight: 600 }}>TikTok</span>
+          <span style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginLeft: "auto" }}>copies link</span>
+        </button>
+      </div>
+      {shareToast && (
+        <div className="a1c-fade" style={{ fontFamily: MONO, fontSize: 13.5, color: C.accentDeep, marginBottom: 16 }}>
+          {shareToast}
+        </div>
+      )}
+
+      <div style={{ height: 1, background: C.lineSoft, margin: "0 0 20px" }} />
+
+      {/* Calendar reminder */}
       <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 12 }}>Reminder</div>
       {!showCal ? (
         <button className="a1c-info" onClick={() => setShowCal(true)}
