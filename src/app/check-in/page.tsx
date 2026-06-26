@@ -400,14 +400,12 @@ function InfoTab() {
     setTimeout(() => setShareToast(""), 2600);
   };
 
-  const shareRowStyle: React.CSSProperties = {
-    display: "flex", alignItems: "center", gap: 12,
-    padding: "11px 0", borderBottom: `1px solid ${C.lineSoft}`,
-    textDecoration: "none", cursor: "pointer", background: "none", border: "none", width: "100%", textAlign: "left",
-  };
-  const iconWrap: React.CSSProperties = {
-    width: 32, height: 32, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center",
-    background: C.accentTint, color: C.accentDeep, flexShrink: 0,
+  const shareChip: React.CSSProperties = {
+    display: "inline-flex", alignItems: "center", gap: 7,
+    padding: "7px 13px", borderRadius: 20,
+    background: C.card, border: `1px solid ${C.line}`,
+    textDecoration: "none", cursor: "pointer", color: C.inkSoft,
+    fontFamily: SERIF, fontSize: 15, fontWeight: 600,
   };
 
   return (
@@ -422,46 +420,32 @@ function InfoTab() {
       <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, marginBottom: 18 }}>
         Everyone knows someone. Help us get more participants by sharing with those you know. Just the link to the study, not your numbers.
       </div>
-      <div style={{ marginBottom: 24 }}>
-        {/* Facebook */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginBottom: 16 }}>
         <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`}
-           target="_blank" rel="noopener noreferrer" style={shareRowStyle}>
-          <span style={iconWrap}>
-            <svg viewBox="0 0 24 24" width={16} height={16} fill="currentColor" aria-hidden><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-          </span>
-          <span style={{ fontFamily: SERIF, fontSize: 16, color: C.ink, fontWeight: 600 }}>Facebook</span>
+           target="_blank" rel="noopener noreferrer" style={shareChip}>
+          <svg viewBox="0 0 24 24" width={15} height={15} fill="currentColor" aria-hidden><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          Facebook
         </a>
-        {/* LinkedIn */}
         <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SITE_URL)}`}
-           target="_blank" rel="noopener noreferrer" style={shareRowStyle}>
-          <span style={iconWrap}>
-            <svg viewBox="0 0 24 24" width={16} height={16} fill="currentColor" aria-hidden>
-              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-              <rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
-            </svg>
-          </span>
-          <span style={{ fontFamily: SERIF, fontSize: 16, color: C.ink, fontWeight: 600 }}>LinkedIn</span>
+           target="_blank" rel="noopener noreferrer" style={shareChip}>
+          <svg viewBox="0 0 24 24" width={15} height={15} fill="currentColor" aria-hidden>
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+            <rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+          </svg>
+          LinkedIn
         </a>
-        {/* Instagram */}
-        <button onClick={() => copyShare("Instagram")} style={shareRowStyle}>
-          <span style={iconWrap}>
-            <svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/>
-              <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
-            </svg>
-          </span>
-          <span style={{ fontFamily: SERIF, fontSize: 16, color: C.ink, fontWeight: 600 }}>Instagram</span>
-          <span style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginLeft: "auto" }}>copies link</span>
+        <button onClick={() => copyShare("Instagram")} style={shareChip}>
+          <svg viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+          </svg>
+          Instagram
         </button>
-        {/* TikTok */}
-        <button onClick={() => copyShare("TikTok")} style={shareRowStyle}>
-          <span style={iconWrap}>
-            <svg viewBox="0 0 24 24" width={16} height={16} fill="currentColor" aria-hidden>
-              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.89a8.18 8.18 0 0 0 4.84 1.55V7a4.85 4.85 0 0 1-1.07-.31z"/>
-            </svg>
-          </span>
-          <span style={{ fontFamily: SERIF, fontSize: 16, color: C.ink, fontWeight: 600 }}>TikTok</span>
-          <span style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginLeft: "auto" }}>copies link</span>
+        <button onClick={() => copyShare("TikTok")} style={shareChip}>
+          <svg viewBox="0 0 24 24" width={15} height={15} fill="currentColor" aria-hidden>
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.89a8.18 8.18 0 0 0 4.84 1.55V7a4.85 4.85 0 0 1-1.07-.31z"/>
+          </svg>
+          TikTok
         </button>
       </div>
       {shareToast && (
