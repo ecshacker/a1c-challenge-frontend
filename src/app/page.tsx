@@ -246,7 +246,7 @@ function EnrollCard({ open }: { open: boolean | null }) {
       <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 26, color: C.ink, marginBottom: 12 }}>Ready to take part?</div>
       {!open && (
         <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 20px" }}>
-          Enrollment opens by Friday — check back soon.
+          Enrollment is not yet open — check back soon.
         </p>
       )}
       {open && (
