@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -108,7 +108,7 @@ function GlucoseGrid({ days, setDays, unit, setUnit }: { days: string[]; setDays
 function StartingNumbers({
   self, editable, a1c, setA1c, fruct, setFruct, fructHow, setFructHow,
   weight, setWeight, unit, setUnit, height, setHeight, heightUnit, setHeightUnit,
-  onSave, saving, saveError,
+  saveError,
 }: {
   self: ParticipantSelf | null;
   editable: boolean;
@@ -119,10 +119,10 @@ function StartingNumbers({
   unit: string; setUnit: (v: string) => void;
   height: string; setHeight: (v: string) => void;
   heightUnit: string; setHeightUnit: (v: string) => void;
-  onSave: () => void;
-  saving: boolean;
   saveError: string | null;
 }) {
+  // self is used for editable context (referenced via prop)
+  void self;
   const row = { display: "flex", alignItems: "center", gap: 10, marginBottom: 16 };
   const lab: React.CSSProperties = { fontFamily: MONO, fontSize: 13.5, color: C.inkSoft, width: 112 };
   const fld: React.CSSProperties = { fontFamily: MONO, fontSize: 16, width: 90, padding: "10px 12px", background: editable ? C.card : C.pageBg, border: `1px solid ${C.line}`, borderRadius: 5, color: C.ink };
@@ -140,7 +140,7 @@ function StartingNumbers({
     <div role="tabpanel" className="a1c-fade">
       <p style={prose}>
         Your baseline — set at sign-up and on day one.
-        {editable ? " Fix or fill anything here; it stays open until week 1 closes, then locks." : " Week 1 has closed — these are now locked."}
+        {editable ? " Fix or fill anything here; it autosaves as you type." : " Week 1 has closed — these are now locked."}
       </p>
 
       <div style={row as React.CSSProperties}>
@@ -187,48 +187,92 @@ function StartingNumbers({
           {saveError}
         </div>
       )}
-
-      {editable && (
-        <button className="a1c-btn a1c-primary" onClick={onSave} disabled={saving || (!!fruct && !fructHow)}
-                style={{ ...btnPrimary, marginTop: 22, opacity: saving ? 0.6 : 1 }}>
-          {saving ? "Saving…" : "Save starting numbers"}
-        </button>
-      )}
     </div>
   );
 }
 
-function PathwayStrip({ current }: { current: string }) {
+function PathwayStrip({ current, selected, onSelect, submitted }: {
+  current: number;
+  selected: number;
+  onSelect: (w: number) => void;
+  submitted: number[];
+}) {
   const PATH = [
-    { id: "e", label: "in", kind: "enroll" },
-    { id: "1", label: "1", kind: "week" }, { id: "2", label: "2", kind: "week" },
-    { id: "3", label: "3", kind: "week" }, { id: "4", label: "4", kind: "milestone" },
-    { id: "5", label: "5", kind: "week" }, { id: "6", label: "6", kind: "week" },
-    { id: "7", label: "7", kind: "week" }, { id: "8", label: "8", kind: "milestone" },
+    { id: 0,  label: "in",  kind: "enroll" },
+    { id: 1,  label: "1",   kind: "week" },
+    { id: 2,  label: "2",   kind: "week" },
+    { id: 3,  label: "3",   kind: "week" },
+    { id: 4,  label: "4",   kind: "milestone" },
+    { id: 5,  label: "5",   kind: "week" },
+    { id: 6,  label: "6",   kind: "week" },
+    { id: 7,  label: "7",   kind: "week" },
+    { id: 8,  label: "8",   kind: "milestone" },
   ];
+
+  // Selectable: "in" (id=0) always, weeks <= current; milestones are display-only
+  const isSelectable = (n: { id: number; kind: string }) =>
+    n.kind !== "milestone" && (n.id === 0 || n.id <= current);
+
+  const statusLabel = selected === 0
+    ? "starting numbers · baseline"
+    : selected < current
+      ? (submitted.includes(selected) ? `week ${selected} · submitted` : `week ${selected} · prior week — still open`)
+      : `week ${selected} · current week`;
+
   return (
-    <div style={{ marginTop: 12, overflowX: "auto" }}>
+    <div style={{ overflowX: "auto" }}>
       <div style={{ display: "flex", alignItems: "center", fontFamily: MONO, fontSize: 13.5, whiteSpace: "nowrap" }}>
         {PATH.map((n, i) => {
-          const isCurrent = n.id === current;
-          const past = !isCurrent && (n.id === "e" || Number(n.id) < Number(current));
-          const isMile = n.kind === "milestone";
-          const fill = isCurrent ? C.accent : past ? C.inkSoft : "transparent";
-          const txt  = isCurrent || past ? C.card : C.inkFaint;
-          const border = isCurrent ? C.accent : past ? C.inkSoft : C.line;
+          const isMile      = n.kind === "milestone";
+          const isSelected  = n.id === selected;
+          const isSubmitted = n.id > 0 && submitted.includes(n.id);
+          const isCurrent   = n.id === current;
+          const selectable  = isSelectable(n);
+
+          // Visual state priority: selected > submitted > current-unselected > past-unsubmitted > future
+          let fill: string, txt: string, border: string, fontWeight: number;
+          if (isSelected) {
+            fill = C.accent; txt = C.card; border = C.accent; fontWeight = 700;
+          } else if (isSubmitted) {
+            fill = C.inkSoft; txt = C.card; border = C.inkSoft; fontWeight = 400;
+          } else if (isCurrent) {
+            fill = "transparent"; txt = C.accent; border = C.accent; fontWeight = 600;
+          } else if (n.id > 0 && n.id < current && !isSubmitted) {
+            // past unsubmitted
+            fill = "transparent"; txt = C.inkFaint; border = C.line; fontWeight = 400;
+          } else if (n.id === 0 && !isSelected) {
+            // "in" node not selected
+            fill = "transparent"; txt = C.inkFaint; border = C.line; fontWeight = 400;
+          } else {
+            // future
+            fill = "transparent"; txt = C.inkFaint; border = C.lineSoft; fontWeight = 400;
+          }
+
+          const inner = isMile ? `${n.label}◆` : n.label;
+
           return (
             <React.Fragment key={n.id}>
               {i > 0 && <span style={{ color: C.line, padding: "0 5px" }}>─</span>}
-              <span title={isMile ? `Milestone at week ${n.id}` : n.id === "e" ? "Enrolled" : `Week ${n.id}`}
-                    style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 22, height: 22, padding: "0 4px", borderRadius: isMile ? 3 : 11, background: fill, color: txt, border: `1px solid ${border}`, fontWeight: isCurrent ? 700 : 400 }}>
-                {isMile ? `${n.label}◆` : n.label}
-              </span>
+              {selectable ? (
+                <button
+                  onClick={() => onSelect(n.id)}
+                  title={isMile ? `Milestone at week ${n.id}` : n.id === 0 ? "Enrolled / baseline" : `Week ${n.id}`}
+                  style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 22, height: 22, padding: "0 4px", borderRadius: isMile ? 3 : 11, background: fill, color: txt, border: `1px solid ${border}`, fontWeight, fontFamily: MONO, fontSize: 13.5, cursor: "pointer" }}>
+                  {inner}
+                </button>
+              ) : (
+                <span
+                  title={isMile ? `Milestone at week ${n.id}` : `Week ${n.id}`}
+                  style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 22, height: 22, padding: "0 4px", borderRadius: isMile ? 3 : 11, background: fill, color: txt, border: `1px solid ${border}`, fontWeight, fontFamily: MONO, fontSize: 13.5 }}>
+                  {inner}
+                </span>
+              )}
             </React.Fragment>
           );
         })}
       </div>
       <div style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint, marginTop: 7 }}>
-        you are on week {current} · next milestone at week 4 (A1C)
+        {statusLabel}
       </div>
     </div>
   );
@@ -402,15 +446,6 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose?: () 
   );
 }
 
-function Line({ k, v }: { k: string; v: string }) {
-  return (
-    <div style={{ display: "flex", justifyContent: "space-between", borderBottom: `1px solid ${C.lineSoft}`, paddingBottom: 8 }}>
-      <span style={{ color: C.inkFaint }}>{k}</span>
-      <span style={{ color: C.ink }}>{v}</span>
-    </div>
-  );
-}
-
 const prose: React.CSSProperties      = { fontFamily: SERIF, fontSize: 17, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 22px" };
 const btnPrimary: React.CSSProperties = { flex: 1, fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.card, background: C.accent, border: "none", borderRadius: 5, padding: "14px", cursor: "pointer" };
 const btnSecondary: React.CSSProperties = { flex: 1, fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.inkSoft, background: "transparent", border: `1px solid ${C.line}`, borderRadius: 5, padding: "14px", cursor: "pointer" };
@@ -420,11 +455,13 @@ export default function WeeklyCheckInPage() {
   const [token,          setToken]          = useState<string | null>(null);
   const [tokenResolved,  setTokenResolved]  = useState(false);
   const [self,           setSelf]           = useState<ParticipantSelf | null>(null);
-  const [studyWeek,      setStudyWeek]      = useState<number>(1);
+  const [currentWeek,    setCurrentWeek]    = useState<number>(1);
+  const [selectedWeek,   setSelectedWeek]   = useState<number>(1);
+  const [submittedWeeks, setSubmittedWeeks] = useState<number[]>([]);
   const [baselineEditable, setBaselineEditable] = useState(true);
   const [mountError,     setMountError]     = useState<string | null>(null);
 
-  // baseline (starting numbers tab)
+  // baseline (starting numbers)
   const [baseA1c,       setBaseA1c]       = useState("");
   const [baseFruct,     setBaseFruct]     = useState("");
   const [baseFructHow,  setBaseFructHow]  = useState("");
@@ -432,7 +469,6 @@ export default function WeeklyCheckInPage() {
   const [baseUnit,      setBaseUnit]      = useState("kg");
   const [baseHeight,    setBaseHeight]    = useState("");
   const [baseHeightUnit,setBaseHeightUnit]= useState("cm");
-  const [baselineSaving,setBaselineSaving]= useState(false);
   const [baselineError, setBaselineError] = useState<string | null>(null);
 
   // weekly check-in
@@ -448,7 +484,6 @@ export default function WeeklyCheckInPage() {
   const [popover,      setPopover]      = useState<string | null>(null);
   const [toast,        setToast]        = useState("");
   const [confirmStep,  setConfirmStep]  = useState<string | null>(null);
-  const [done,         setDone]         = useState(false);
   const [submitting,   setSubmitting]   = useState(false);
   const [warnings,     setWarnings]     = useState<string[]>([]);
 
@@ -476,9 +511,14 @@ export default function WeeklyCheckInPage() {
   const [showExercise, setShowExercise] = useState(false);
   const [showClinical, setShowClinical] = useState(false);
 
-  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autosaveTimer    = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const baselineTimer    = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const selectedWeekRef  = useRef(selectedWeek);
+  const submittedWeeksRef = useRef(submittedWeeks);
 
-  const isWeek1 = studyWeek === 1;
+  // Keep refs in sync so callbacks have current values without re-creating
+  useEffect(() => { selectedWeekRef.current = selectedWeek; }, [selectedWeek]);
+  useEffect(() => { submittedWeeksRef.current = submittedWeeks; }, [submittedWeeks]);
 
   // Defer token read to client-only to avoid SSR hydration mismatch
   useEffect(() => {
@@ -487,7 +527,45 @@ export default function WeeklyCheckInPage() {
     setTokenResolved(true);
   }, []);
 
-  // On mount: fetch participant state and any existing draft
+  // Helper: restore draft fields from raw draftData object
+  const restoreDraftFields = (d: Record<string, unknown>) => {
+    if (d.hemp)        setHemp(d.hemp as (boolean | null)[]);
+    if (d.cannabis)    setCannabis(d.cannabis as (boolean | null)[]);
+    if (d.hempAmt)     setHempAmt(String(d.hempAmt));
+    if (d.cannAmt)     setCannAmt(String(d.cannAmt));
+    if (d.cannMethod)  setCannMethod(d.cannMethod as string);
+    if (d.cannStrain)  setCannStrain(d.cannStrain as string);
+    if (d.glucoseUnit) setGlucoseUnit(d.glucoseUnit as string);
+    if (d.glucoseDays) setGlucoseDays(d.glucoseDays as string[]);
+    if (d.cgmTir)      setCgmTir(String(d.cgmTir));
+    if (d.cgmTar)      setCgmTar(String(d.cgmTar));
+    if (d.cgmTbr)      setCgmTbr(String(d.cgmTbr));
+    if (d.cgmCv)       setCgmCv(String(d.cgmCv));
+    if (d.wb)          setWb(d.wb as Record<string, number>);
+    if (d.weight)      setWeight(String(d.weight));
+    if (d.unit)        setUnit(d.unit as string);
+    if (d.exDays)      setExDays(d.exDays as string);
+    if (d.exType)      setExType(d.exType as string);
+    if (d.medChange)   setMedChange(d.medChange as string);
+    if (d.stdCare)     setStdCare(d.stdCare as string);
+    if (d.note)        setNote(d.note as string);
+  };
+
+  // Helper: reset all weekly form fields
+  const resetWeeklyFields = () => {
+    setHemp(Array(7).fill(null));
+    setCannabis(Array(7).fill(null));
+    setHempAmt(""); setCannAmt("");
+    setCannMethod(""); setCannStrain("");
+    setGlucoseUnit("mgdl"); setGlucoseDays(Array(7).fill(""));
+    setCgmTir(""); setCgmTar(""); setCgmTbr(""); setCgmCv("");
+    setWb({}); setWeight(""); setUnit("kg");
+    setExDays(""); setExType("");
+    setMedChange(""); setStdCare("");
+    setNote("");
+  };
+
+  // On mount: fetch participant state, submitted weeks, and draft for current week
   useEffect(() => {
     if (!tokenResolved) return;
     if (!token) {
@@ -495,12 +573,16 @@ export default function WeeklyCheckInPage() {
       return;
     }
 
+    let resolvedWeek = 1;
+
     api.get("/participants/me")
       .then((meData) => {
         const p = meData as ParticipantSelf;
         setSelf(p);
         const wk = p.studyWeek ?? null;
-        setStudyWeek(wk ?? 1);
+        resolvedWeek = wk ?? 1;
+        setCurrentWeek(resolvedWeek);
+        setSelectedWeek(resolvedWeek);
         setBaselineEditable(p.baselineEditable);
         setBaseA1c(p.baselineA1c ? String(p.baselineA1c) : "");
         setBaseFruct(p.baselineFructosamine ? String(p.baselineFructosamine) : "");
@@ -510,42 +592,29 @@ export default function WeeklyCheckInPage() {
         setBaseHeight(p.heightValue ? String(p.heightValue) : "");
         setBaseHeightUnit(p.heightUnit ?? "cm");
 
-        // Don't fetch draft if study hasn't started yet
-        if (wk == null || wk < 1) return;
+        if (wk == null || wk < 1) return Promise.resolve(null);
 
-        return api.get(`/checkins/draft?studyWeek=${wk}`);
+        // Fetch submitted weeks and draft in parallel
+        return Promise.all([
+          api.get("/checkins/submitted-weeks"),
+          api.get(`/checkins/draft?studyWeek=${resolvedWeek}`).catch((err) => {
+            if (err instanceof ApiError && (err.status === 404 || err.status === 400)) return null;
+            throw err;
+          }),
+        ]);
       })
-      .then((draft) => {
-        if (!draft) return;
-        const d = (draft as { draftData: Record<string, unknown> }).draftData;
-        if (d.hemp)        setHemp(d.hemp as (boolean | null)[]);
-        if (d.cannabis)    setCannabis(d.cannabis as (boolean | null)[]);
-        if (d.hempAmt)     setHempAmt(String(d.hempAmt));
-        if (d.cannAmt)     setCannAmt(String(d.cannAmt));
-        if (d.cannMethod)  setCannMethod(d.cannMethod as string);
-        if (d.cannStrain)  setCannStrain(d.cannStrain as string);
-        if (d.glucoseUnit) setGlucoseUnit(d.glucoseUnit as string);
-        if (d.glucoseDays) setGlucoseDays(d.glucoseDays as string[]);
-        if (d.cgmTir)      setCgmTir(String(d.cgmTir));
-        if (d.cgmTar)      setCgmTar(String(d.cgmTar));
-        if (d.cgmTbr)      setCgmTbr(String(d.cgmTbr));
-        if (d.cgmCv)       setCgmCv(String(d.cgmCv));
-        if (d.wb)          setWb(d.wb as Record<string, number>);
-        if (d.weight)      setWeight(String(d.weight));
-        if (d.unit)        setUnit(d.unit as string);
-        if (d.exDays)      setExDays(d.exDays as string);
-        if (d.exType)      setExType(d.exType as string);
-        if (d.medChange)   setMedChange(d.medChange as string);
-        if (d.stdCare)     setStdCare(d.stdCare as string);
-        if (d.note)        setNote(d.note as string);
+      .then((results) => {
+        if (!results) return;
+        const [swData, draft] = results as [{ submittedWeeks: number[] } | null, { draftData: Record<string, unknown> } | null];
+        if (swData?.submittedWeeks) setSubmittedWeeks(swData.submittedWeeks);
+        if (draft?.draftData) restoreDraftFields(draft.draftData);
       })
       .catch((err) => {
-        if (err instanceof ApiError && err.status === 404) return; // no draft yet — fine
-        if (err instanceof ApiError && err.status === 400) return; // draft not available yet — proceed with blank form
         if (err instanceof ApiError && err.error !== "NO_TOKEN") {
           setMountError(err.error);
         }
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenResolved, token, router]);
 
   useEffect(() => {
@@ -554,15 +623,16 @@ export default function WeeklyCheckInPage() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  // Autosave draft — debounced 2s
+  // Autosave draft — debounced 2s; skip for baseline (selectedWeek=0) or already-submitted
   const saveDraft = useCallback(() => {
-    if (!token || !studyWeek) return;
+    const sw = selectedWeekRef.current;
+    if (!token || sw === 0 || submittedWeeksRef.current.includes(sw)) return;
     api.post("/checkins/draft", {
-      studyWeek,
+      studyWeek: sw,
       lastSavedOffset: todayDayOffset(),
       draftData: { hemp, cannabis, hempAmt, cannAmt, cannMethod, cannStrain, glucoseUnit, glucoseDays, cgmTir, cgmTar, cgmTbr, cgmCv, wb, weight, unit, exDays, exType, medChange, stdCare, note },
     }).catch(() => { /* silent — draft save is best-effort */ });
-  }, [token, studyWeek, hemp, cannabis, hempAmt, cannAmt, cannMethod, cannStrain, glucoseUnit, glucoseDays, cgmTir, cgmTar, cgmTbr, cgmCv, wb, weight, unit, exDays, exType, medChange, stdCare, note]);
+  }, [token, hemp, cannabis, hempAmt, cannAmt, cannMethod, cannStrain, glucoseUnit, glucoseDays, cgmTir, cgmTar, cgmTbr, cgmCv, wb, weight, unit, exDays, exType, medChange, stdCare, note]);
 
   useEffect(() => {
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
@@ -570,46 +640,61 @@ export default function WeeklyCheckInPage() {
     return () => { if (autosaveTimer.current) clearTimeout(autosaveTimer.current); };
   }, [saveDraft]);
 
-  const saveBaseline = async () => {
-    setBaselineSaving(true);
+  // Baseline autosave — debounced 2s, silent
+  const saveBaseline = useCallback(() => {
+    if (!token || !baselineEditable) return;
+    const hasWeight = !!baseWeight;
+    const hasHeight = !!baseHeight;
+    if (hasWeight !== hasHeight) {
+      setBaselineError("Weight and height must both be filled or both left blank.");
+      return;
+    }
     setBaselineError(null);
-    try {
-      const hasWeight = !!baseWeight;
-      const hasHeight = !!baseHeight;
-      if (hasWeight !== hasHeight) {
-        setBaselineError("Weight and height must both be filled or both left blank.");
-        return;
-      }
-      const payload: Record<string, unknown> = {
-        baselineA1c: parseFloat(baseA1c),
-        baselineFructosamine:         baseFruct ? parseFloat(baseFruct) : null,
-        baselineFructosamineTestType: baseFruct ? (FRUCT_TEST_MAP[baseFructHow] ?? null) : null,
-        weightValue: hasWeight ? parseFloat(baseWeight) : null,
-        weightUnit:  hasWeight ? (baseUnit === "lb" ? "lbs" : baseUnit) : null,
-        heightValue: hasHeight ? parseFloat(baseHeight) : null,
-        heightUnit:  hasHeight ? baseHeightUnit : null,
-      };
-      await api.patch("/participants/me/baseline", payload);
-      setToast("Baseline saved.");
-    } catch (err) {
+    const payload: Record<string, unknown> = {
+      baselineA1c: parseFloat(baseA1c) || null,
+      baselineFructosamine:         baseFruct ? parseFloat(baseFruct) : null,
+      baselineFructosamineTestType: baseFruct ? (FRUCT_TEST_MAP[baseFructHow] ?? null) : null,
+      weightValue: hasWeight ? parseFloat(baseWeight) : null,
+      weightUnit:  hasWeight ? (baseUnit === "lb" ? "lbs" : baseUnit) : null,
+      heightValue: hasHeight ? parseFloat(baseHeight) : null,
+      heightUnit:  hasHeight ? baseHeightUnit : null,
+    };
+    api.patch("/participants/me/baseline", payload).catch((err) => {
       if (err instanceof ApiError && err.status === 409) {
         setBaselineError("Week 1 has closed — baseline is now locked.");
         setBaselineEditable(false);
-      } else if (err instanceof ApiError) {
-        setBaselineError(err.details ? Object.values(err.details).join(" · ") : err.error);
-      } else {
-        setBaselineError("Save failed — please try again.");
       }
-    } finally {
-      setBaselineSaving(false);
-    }
+      // Other errors suppressed on debounced save
+    });
+  }, [token, baselineEditable, baseA1c, baseFruct, baseFructHow, baseWeight, baseUnit, baseHeight, baseHeightUnit]);
+
+  useEffect(() => {
+    if (baselineTimer.current) clearTimeout(baselineTimer.current);
+    baselineTimer.current = setTimeout(saveBaseline, 2000);
+    return () => { if (baselineTimer.current) clearTimeout(baselineTimer.current); };
+  }, [saveBaseline]);
+
+  const handleWeekSelect = (w: number) => {
+    setSelectedWeek(w);
+    if (w === 0) return; // baseline fields already loaded at mount
+    // Reset weekly fields then fetch and restore draft for the selected week
+    resetWeeklyFields();
+    api.get(`/checkins/draft?studyWeek=${w}`)
+      .then((draft) => {
+        if (!draft) return;
+        const d = (draft as { draftData: Record<string, unknown> }).draftData;
+        if (d) restoreDraftFields(d);
+      })
+      .catch((err) => {
+        if (err instanceof ApiError && (err.status === 404 || err.status === 400)) return; // no draft — fine
+      });
   };
 
   const submitCheckIn = async () => {
     setSubmitting(true);
     try {
       const payload = {
-        studyWeek,
+        studyWeek: selectedWeek,
         submittedAtDayOffset: todayDayOffset(),
         hempDayMon: hemp[0], hempDayTue: hemp[1], hempDayWed: hemp[2],
         hempDayThu: hemp[3], hempDayFri: hemp[4], hempDaySat: hemp[5], hempDaySun: hemp[6],
@@ -647,7 +732,8 @@ export default function WeeklyCheckInPage() {
       };
       const res = await api.post("/checkins", payload) as { warnings?: string[] };
       setWarnings(res.warnings ?? []);
-      setDone(true);
+      // Mark as submitted locally — no need to re-fetch
+      setSubmittedWeeks(prev => prev.includes(selectedWeek) ? prev : [...prev, selectedWeek]);
     } catch (err) {
       if (err instanceof ApiError) {
         setToast(err.status === 409 ? "This week has already been submitted." : err.error);
@@ -664,7 +750,6 @@ export default function WeeklyCheckInPage() {
   const not         = (arr: (boolean | null)[]) => arr.filter((v) => v === false).length;
   const hempAnswered = answered(hemp);
   const cannAnswered = answered(cannabis);
-  const weekComplete = hempAnswered === 7 && cannAnswered === 7;
   const wbDone       = Object.keys(wb).length;
 
   const tapDay = (arr: (boolean | null)[], set: (a: (boolean | null)[]) => void, i: number) => {
@@ -699,10 +784,13 @@ export default function WeeklyCheckInPage() {
     );
   }
 
+  const isWeekSubmitted = selectedWeek > 0 && submittedWeeks.includes(selectedWeek);
+
   return (
     <div className="a1c-root" style={{ background: C.pageBg, height: "100vh", display: "flex", flexDirection: "column", color: C.ink, overflow: "hidden" }}>
-<div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+      <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
         <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "18px 18px 26px", boxSizing: "border-box" }}>
+          {/* Header row: title info + token */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, position: "relative" }}>
             <button className="a1c-info" onClick={() => setPopover(popover === "title" ? null : "title")} aria-expanded={popover === "title"}
                     style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.04em", color: C.inkSoft, background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}>
@@ -727,20 +815,36 @@ export default function WeeklyCheckInPage() {
             )}
           </div>
 
+          {/* Week heading + PathwayStrip + submit/recorded chip */}
           <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 54, lineHeight: 1, letterSpacing: "-0.02em", marginTop: 10 }}>
-            Week {studyWeek}
+            {selectedWeek === 0 ? "Starting numbers" : `Week ${selectedWeek}`}
           </div>
 
-          <PathwayStrip current={String(studyWeek)} />
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginTop: 12 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <PathwayStrip
+                current={currentWeek}
+                selected={selectedWeek}
+                onSelect={handleWeekSelect}
+                submitted={submittedWeeks}
+              />
+            </div>
+            {selectedWeek > 0 && (
+              isWeekSubmitted
+                ? <div style={{ fontFamily: MONO, fontSize: 12.5, color: C.accentDeep, background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 5, padding: "6px 12px", whiteSpace: "nowrap", marginTop: 2 }}>
+                    Week {selectedWeek} recorded ✓
+                  </div>
+                : <button onClick={onDone} disabled={submitting}
+                          style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 700, color: C.card, background: C.accent, border: "none", borderRadius: 5, padding: "8px 14px", cursor: "pointer", whiteSpace: "nowrap", marginTop: 2, opacity: submitting ? 0.6 : 1 }}>
+                    {submitting ? "Submitting…" : `Submit week ${selectedWeek} →`}
+                  </button>
+            )}
+          </div>
+
           <div style={{ height: 1, background: C.line, margin: "14px 0 18px" }} />
 
-          <div role="tablist" aria-label="Check-in sections" style={{ display: "flex", gap: 7, marginBottom: 22 }}>
-            <Tab id="objective" active={tab} onClick={setTab} sub="for science">Intake &amp; measures</Tab>
-            {isWeek1 && <Tab id="starting" active={tab} onClick={setTab} sub="week 1 · baseline">Starting numbers</Tab>}
-            <Tab id="subjective" active={tab} onClick={setTab} sub="how it felt">This week</Tab>
-          </div>
-
-          {tab === "starting" ? (
+          {/* Content: baseline or weekly tabs */}
+          {selectedWeek === 0 ? (
             <StartingNumbers
               self={self}
               editable={baselineEditable}
@@ -751,121 +855,105 @@ export default function WeeklyCheckInPage() {
               unit={baseUnit} setUnit={setBaseUnit}
               height={baseHeight} setHeight={setBaseHeight}
               heightUnit={baseHeightUnit} setHeightUnit={setBaseHeightUnit}
-              onSave={saveBaseline}
-              saving={baselineSaving}
               saveError={baselineError}
             />
-          ) : tab === "objective" ? (
-            <div role="tabpanel" className="a1c-fade">
-              <p style={prose}>Mark each day you had it, eaten as food.</p>
-              <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, margin: "-10px 0 22px" }}>
-                tap a day to cycle · <span style={{ color: C.accentDeep }}>had it</span> → <span style={{ textDecoration: "line-through" }}>didn&rsquo;t</span> → clear
-              </div>
-              <IntakeRow title="Hemp seed" hint={self ? `your amount · ${self.baselineA1c ? "" : ""}` : ""} days={hemp} onTap={(i) => tapDay(hemp, setHemp, i)} had={had(hemp)} not={not(hemp)} unanswered={7 - hempAnswered}
-                         amount={hempAmt} setAmount={setHempAmt} echo={parseFloat(hempAmt) ? `≈ ${(parseFloat(hempAmt) / 10).toFixed(1)} tbsp` : "1 tbsp ≈ 10 g"} step={10} />
-              <IntakeRow title="Raw cannabis flower" hint="aim · at least 1 g/day, raw" days={cannabis} onTap={(i) => tapDay(cannabis, setCannabis, i)} had={had(cannabis)} not={not(cannabis)} unanswered={7 - cannAnswered}
-                         amount={cannAmt} setAmount={setCannAmt} />
-              <div style={{ height: 1, background: C.lineSoft, margin: "24px 0 16px" }} />
-              <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 13 }}>Measures about you</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <label style={{ fontFamily: MONO, fontSize: 14.5, color: C.inkSoft, width: 96 }}>Your weight</label>
-                <input inputMode="decimal" value={weight} onChange={(e) => setWeight(dec1(e.target.value))} placeholder="—"
-                       style={{ fontFamily: MONO, fontSize: 16.5, width: 96, padding: "9px 11px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
-                <div style={{ display: "flex", border: `1px solid ${C.line}`, borderRadius: 4, overflow: "hidden" }}>
-                  {["kg", "lb"].map((u) => (
-                    <button key={u} className="a1c-unit" onClick={() => setUnit(u)}
-                            style={{ fontFamily: MONO, fontSize: 14.5, padding: "9px 16px", border: "none", cursor: "pointer", background: unit === u ? C.accent : C.card, color: unit === u ? C.card : C.inkSoft }}>
-                      {u}
-                    </button>
-                  ))}
-                </div>
-                <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>optional</span>
-              </div>
-
-              <div style={{ marginTop: 18 }}>
-                <ExpandGroup label="Cannabis — method &amp; strain" show={showCann} onToggle={() => setShowCann(s => !s)}>
-                  <PickRow label="How did you have it this week?" value={cannMethod} set={setCannMethod}
-                           opts={["Juice / smoothie", "Eaten directly", "Cold infusion", "Mixed", "None this week"]} />
-                  <PickRow label="Strain type (if known)" value={cannStrain} set={setCannStrain}
-                           opts={["Sativa", "Indica", "Balanced", "Not selected"]} />
-                </ExpandGroup>
-
-                <ExpandGroup label="Fasting glucose" show={showGlucose} onToggle={() => setShowGlucose(s => !s)}>
-                  <GlucoseGrid days={glucoseDays} setDays={setGlucoseDays} unit={glucoseUnit} setUnit={setGlucoseUnit} />
-                  {self?.glucoseMonitoringType === "cgm" && (
-                    <div style={{ marginTop: 14 }}>
-                      <ExpandGroup label="CGM metrics" show={showCgm} onToggle={() => setShowCgm(s => !s)}>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 4 }}>
-                          {([
-                            ["Time in Range", "70–180 · %", cgmTir, setCgmTir],
-                            ["Time Above Range", ">180 · %", cgmTar, setCgmTar],
-                            ["Time Below Range", "<70 · %", cgmTbr, setCgmTbr],
-                            ["CV", "target <36%", cgmCv, setCgmCv],
-                          ] as [string, string, string, (v: string) => void][]).map(([lbl, hint, val, set]) => (
-                            <div key={lbl}>
-                              <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginBottom: 5 }}>{lbl}</div>
-                              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                                <input inputMode="decimal" value={val} onChange={(e) => set(dec1(e.target.value))} placeholder="—"
-                                       style={{ fontFamily: MONO, fontSize: 15, width: 64, padding: "7px 8px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
-                                <span style={{ fontFamily: MONO, fontSize: 11, color: C.inkFaint }}>{hint}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </ExpandGroup>
-                    </div>
-                  )}
-                </ExpandGroup>
-
-                <ExpandGroup label="Exercise this week" show={showExercise} onToggle={() => setShowExercise(s => !s)}>
-                  <PickRow label="Days active" value={exDays} set={setExDays}
-                           opts={["Zero", "1–2 days", "3–4 days", "5+ days"]} />
-                  <PickRow label="Main type" value={exType} set={setExType}
-                           opts={["Aerobic", "Resistance", "Walking", "Mixed", "None"]} />
-                </ExpandGroup>
-
-                <ExpandGroup label="Clinical notes" show={showClinical} onToggle={() => setShowClinical(s => !s)}>
-                  <PickRow label="Medication or dose changes this week?" value={medChange} set={setMedChange}
-                           opts={["No changes", "Dose reduced", "Medication stopped", "New med added"]} />
-                  <PickRow label="Standard care contact this week?" value={stdCare} set={setStdCare}
-                           opts={["No", "Scheduled visit", "Lab A1C", "Other"]} />
-                </ExpandGroup>
-              </div>
-            </div>
-          ) : (
-            <div role="tabpanel" className="a1c-fade">
-              <p style={prose}>A quick read on each, 1 to 5. Your sense of the week is enough — blank is a fine answer.</p>
-              {WELLBEING.map(({ id, ...rest }) => (
-                <ScaleRow key={id} {...rest} value={wb[id]} onPick={(v) => setWb({ ...wb, [id]: v })} />
-              ))}
-              <div style={{ height: 1, background: C.lineSoft, margin: "22px 0 18px" }} />
-              <label style={{ fontFamily: MONO, fontSize: 14.5, color: C.inkSoft, display: "block", marginBottom: 9 }}>Anything worth noting</label>
-              <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3}
-                        placeholder="A change you noticed, a hard week, a question for yourself later…"
-                        style={{ width: "100%", boxSizing: "border-box", fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.6, padding: "13px 15px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink, resize: "vertical" }} />
-            </div>
-          )}
-
-          {tab === "starting" ? (
-            <button className="a1c-btn a1c-primary" onClick={() => setTab("objective")} style={{ ...btnPrimary, width: "100%", marginTop: 28 }}>
-              Continue to this week →
-            </button>
           ) : (
             <>
-              <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
-                <button className={`a1c-btn ${weekComplete ? "a1c-secondary" : "a1c-primary"}`}
-                        onClick={() => { saveDraft(); setToast("Draft saved — close and come back any time before the week closes."); }}
-                        style={weekComplete ? btnSecondary : btnPrimary}>
-                  Save as draft
-                </button>
-                <button className={`a1c-btn ${weekComplete ? "a1c-primary" : "a1c-secondary"}`} onClick={onDone} disabled={submitting}
-                        style={weekComplete ? { ...btnPrimary, opacity: submitting ? 0.6 : 1 } : btnSecondary}>
-                  {submitting ? "Submitting…" : "Done"}
-                </button>
+              <div role="tablist" aria-label="Check-in sections" style={{ display: "flex", gap: 7, marginBottom: 22 }}>
+                <Tab id="objective" active={tab} onClick={setTab} sub="for science">Intake &amp; measures</Tab>
+                <Tab id="subjective" active={tab} onClick={setTab} sub="how it felt">This week</Tab>
               </div>
-              <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.6, color: C.inkFaint, margin: "14px 2px 0", textAlign: "center" }}>
-                Both keep your work. <strong style={{ color: C.inkSoft, fontWeight: 700 }}>Done</strong> marks the week complete; you can still reopen and change it until the week closes.
-              </p>
+
+              {tab === "objective" ? (
+                <div role="tabpanel" className="a1c-fade">
+                  <p style={prose}>Mark each day you had it, eaten as food.</p>
+                  <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, margin: "-10px 0 22px" }}>
+                    tap a day to cycle · <span style={{ color: C.accentDeep }}>had it</span> → <span style={{ textDecoration: "line-through" }}>didn&rsquo;t</span> → clear
+                  </div>
+                  <IntakeRow title="Hemp seed" hint={self ? `your amount · ${self.baselineA1c ? "" : ""}` : ""} days={hemp} onTap={(i) => tapDay(hemp, setHemp, i)} had={had(hemp)} not={not(hemp)} unanswered={7 - hempAnswered}
+                             amount={hempAmt} setAmount={setHempAmt} echo={parseFloat(hempAmt) ? `≈ ${(parseFloat(hempAmt) / 10).toFixed(1)} tbsp` : "1 tbsp ≈ 10 g"} step={10} />
+                  <IntakeRow title="Raw cannabis flower" hint="aim · at least 1 g/day, raw" days={cannabis} onTap={(i) => tapDay(cannabis, setCannabis, i)} had={had(cannabis)} not={not(cannabis)} unanswered={7 - cannAnswered}
+                             amount={cannAmt} setAmount={setCannAmt} />
+                  <div style={{ height: 1, background: C.lineSoft, margin: "24px 0 16px" }} />
+                  <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 13 }}>Measures about you</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <label style={{ fontFamily: MONO, fontSize: 14.5, color: C.inkSoft, width: 96 }}>Your weight</label>
+                    <input inputMode="decimal" value={weight} onChange={(e) => setWeight(dec1(e.target.value))} placeholder="—"
+                           style={{ fontFamily: MONO, fontSize: 16.5, width: 96, padding: "9px 11px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
+                    <div style={{ display: "flex", border: `1px solid ${C.line}`, borderRadius: 4, overflow: "hidden" }}>
+                      {["kg", "lb"].map((u) => (
+                        <button key={u} className="a1c-unit" onClick={() => setUnit(u)}
+                                style={{ fontFamily: MONO, fontSize: 14.5, padding: "9px 16px", border: "none", cursor: "pointer", background: unit === u ? C.accent : C.card, color: unit === u ? C.card : C.inkSoft }}>
+                          {u}
+                        </button>
+                      ))}
+                    </div>
+                    <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>optional</span>
+                  </div>
+
+                  <div style={{ marginTop: 18 }}>
+                    <ExpandGroup label="Cannabis — method &amp; strain" show={showCann} onToggle={() => setShowCann(s => !s)}>
+                      <PickRow label="How did you have it this week?" value={cannMethod} set={setCannMethod}
+                               opts={["Juice / smoothie", "Eaten directly", "Cold infusion", "Mixed", "None this week"]} />
+                      <PickRow label="Strain type (if known)" value={cannStrain} set={setCannStrain}
+                               opts={["Sativa", "Indica", "Balanced", "Not selected"]} />
+                    </ExpandGroup>
+
+                    <ExpandGroup label="Fasting glucose" show={showGlucose} onToggle={() => setShowGlucose(s => !s)}>
+                      <GlucoseGrid days={glucoseDays} setDays={setGlucoseDays} unit={glucoseUnit} setUnit={setGlucoseUnit} />
+                      {self?.glucoseMonitoringType === "cgm" && (
+                        <div style={{ marginTop: 14 }}>
+                          <ExpandGroup label="CGM metrics" show={showCgm} onToggle={() => setShowCgm(s => !s)}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 4 }}>
+                              {([
+                                ["Time in Range", "70–180 · %", cgmTir, setCgmTir],
+                                ["Time Above Range", ">180 · %", cgmTar, setCgmTar],
+                                ["Time Below Range", "<70 · %", cgmTbr, setCgmTbr],
+                                ["CV", "target <36%", cgmCv, setCgmCv],
+                              ] as [string, string, string, (v: string) => void][]).map(([lbl, hint, val, set]) => (
+                                <div key={lbl}>
+                                  <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginBottom: 5 }}>{lbl}</div>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                                    <input inputMode="decimal" value={val} onChange={(e) => set(dec1(e.target.value))} placeholder="—"
+                                           style={{ fontFamily: MONO, fontSize: 15, width: 64, padding: "7px 8px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
+                                    <span style={{ fontFamily: MONO, fontSize: 11, color: C.inkFaint }}>{hint}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </ExpandGroup>
+                        </div>
+                      )}
+                    </ExpandGroup>
+
+                    <ExpandGroup label="Exercise this week" show={showExercise} onToggle={() => setShowExercise(s => !s)}>
+                      <PickRow label="Days active" value={exDays} set={setExDays}
+                               opts={["Zero", "1–2 days", "3–4 days", "5+ days"]} />
+                      <PickRow label="Main type" value={exType} set={setExType}
+                               opts={["Aerobic", "Resistance", "Walking", "Mixed", "None"]} />
+                    </ExpandGroup>
+
+                    <ExpandGroup label="Clinical notes" show={showClinical} onToggle={() => setShowClinical(s => !s)}>
+                      <PickRow label="Medication or dose changes this week?" value={medChange} set={setMedChange}
+                               opts={["No changes", "Dose reduced", "Medication stopped", "New med added"]} />
+                      <PickRow label="Standard care contact this week?" value={stdCare} set={setStdCare}
+                               opts={["No", "Scheduled visit", "Lab A1C", "Other"]} />
+                    </ExpandGroup>
+                  </div>
+                </div>
+              ) : (
+                <div role="tabpanel" className="a1c-fade">
+                  <p style={prose}>A quick read on each, 1 to 5. Your sense of the week is enough — blank is a fine answer.</p>
+                  {WELLBEING.map(({ id, ...rest }) => (
+                    <ScaleRow key={id} {...rest} value={wb[id]} onPick={(v) => setWb({ ...wb, [id]: v })} />
+                  ))}
+                  <div style={{ height: 1, background: C.lineSoft, margin: "22px 0 18px" }} />
+                  <label style={{ fontFamily: MONO, fontSize: 14.5, color: C.inkSoft, display: "block", marginBottom: 9 }}>Anything worth noting</label>
+                  <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3}
+                            placeholder="A change you noticed, a hard week, a question for yourself later…"
+                            style={{ width: "100%", boxSizing: "border-box", fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.6, padding: "13px 15px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink, resize: "vertical" }} />
+                </div>
+              )}
             </>
           )}
         </div>
@@ -881,35 +969,31 @@ export default function WeeklyCheckInPage() {
 
       {confirmStep === "ask" && (
         <Modal>
-          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep }}>Before you finish</div>
-          <div style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 700, color: C.ink, margin: "10px 0 12px", lineHeight: 1.3 }}>Finish week {studyWeek}?</div>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep }}>Before you submit</div>
+          <div style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 700, color: C.ink, margin: "10px 0 12px", lineHeight: 1.3 }}>Submit week {selectedWeek} to the study?</div>
           <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: 0 }}>
             You filled in {wbDone} of the six reads on <em>This week</em>. Blank is a fine answer — fill the rest only if something comes to mind.
           </p>
+          <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.6, color: C.inkFaint, margin: "12px 0 0" }}>
+            This enters your data into the study. You won&rsquo;t be able to change it after submitting.
+          </p>
           <div style={{ display: "flex", gap: 12, marginTop: 22 }}>
             <button className="a1c-btn a1c-secondary" onClick={() => setConfirmStep(null)} style={{ ...btnSecondary, flex: 1 }}>Keep editing</button>
-            <button className="a1c-btn a1c-primary" onClick={() => { setConfirmStep(null); submitCheckIn(); }} style={{ ...btnPrimary, flex: 1 }}>Finish week</button>
+            <button className="a1c-btn a1c-primary" onClick={() => { setConfirmStep(null); submitCheckIn(); }} style={{ ...btnPrimary, flex: 1 }}>Submit to study</button>
           </div>
         </Modal>
       )}
 
-      {done && (
-        <Modal onClose={() => setDone(false)}>
-          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep }}>Week complete</div>
-          <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 32, color: C.ink, margin: "10px 0 18px", letterSpacing: "-0.01em" }}>Week {studyWeek} is in</div>
-          <div style={{ display: "grid", gap: 9, fontFamily: MONO, fontSize: 14, color: C.inkSoft }}>
-            <Line k="days had" v={`${had(hemp) + had(cannabis)}`} />
-            <Line k="wellbeing" v={`${wbDone} of 6 noted`} />
+      {warnings.length > 0 && (
+        <Modal onClose={() => setWarnings([])}>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep }}>Heads up</div>
+          <div style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 24, color: C.ink, margin: "10px 0 16px", letterSpacing: "-0.01em" }}>Week {selectedWeek} recorded</div>
+          <div style={{ padding: "12px 14px", background: "#FEF9EC", border: "1px solid #C8A44A", borderRadius: 6 }}>
+            {warnings.map((w, i) => (
+              <div key={i} style={{ fontFamily: SERIF, fontSize: 13.5, color: "#7A6020", lineHeight: 1.5, marginBottom: i < warnings.length - 1 ? 8 : 0 }}>{w}</div>
+            ))}
           </div>
-          {warnings.length > 0 && (
-            <div style={{ marginTop: 16, padding: "12px 14px", background: "#FEF9EC", border: "1px solid #C8A44A", borderRadius: 6 }}>
-              {warnings.map((w, i) => (
-                <div key={i} style={{ fontFamily: SERIF, fontSize: 13.5, color: "#7A6020", lineHeight: 1.5, marginBottom: i < warnings.length - 1 ? 8 : 0 }}>{w}</div>
-              ))}
-            </div>
-          )}
-          <p style={{ fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.6, color: C.inkFaint, margin: "20px 0 0" }}>Nothing here identifies you. You can reopen week {studyWeek} and change it until it closes.</p>
-          <button className="a1c-btn a1c-primary" onClick={() => setDone(false)} style={{ ...btnPrimary, marginTop: 22, width: "100%" }}>Back to my week</button>
+          <button className="a1c-btn a1c-primary" onClick={() => setWarnings([])} style={{ ...btnPrimary, marginTop: 22, width: "100%" }}>OK</button>
         </Modal>
       )}
     </div>
