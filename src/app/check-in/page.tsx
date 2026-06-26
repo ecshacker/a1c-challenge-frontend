@@ -236,16 +236,17 @@ function PathwayStrip({ current, selected, onSelect, submitted }: {
           } else if (isSubmitted) {
             fill = C.inkSoft; txt = C.card; border = C.inkSoft; fontWeight = 400;
           } else if (isCurrent) {
+            // open, not selected → empty circle
             fill = "transparent"; txt = C.accent; border = C.accent; fontWeight = 600;
-          } else if (n.id > 0 && n.id < current && !isSubmitted) {
-            // past unsubmitted
-            fill = "transparent"; txt = C.inkFaint; border = C.line; fontWeight = 400;
           } else if (n.id === 0 && !isSelected) {
-            // "in" node not selected
-            fill = "transparent"; txt = C.inkFaint; border = C.line; fontWeight = 400;
+            // "in" always open → empty circle
+            fill = "transparent"; txt = C.accentDeep; border = C.accentDeep; fontWeight = 400;
+          } else if (n.id > 0 && n.id === current - 1 && !isSubmitted) {
+            // prior week still open → empty circle
+            fill = "transparent"; txt = C.accent; border = C.accent; fontWeight = 400;
           } else {
-            // future
-            fill = "transparent"; txt = C.inkFaint; border = C.lineSoft; fontWeight = 400;
+            // closed (submitted, past-closed, future) → no circle border
+            fill = "transparent"; txt = isSubmitted ? C.inkSoft : C.inkFaint; border = "transparent"; fontWeight = 400;
           }
 
           const inner = isMile ? `${n.label}◆` : n.label;
@@ -364,7 +365,7 @@ function ScaleRow({ label, low, high, value, onPick }: { label: string; low: str
   );
 }
 
-function EducationPane() {
+function InfoTab() {
   const [showCal, setShowCal] = useState(false);
   const [calDay, setCalDay]   = useState(0);
   const linkRef = useRef<HTMLAnchorElement>(null);
@@ -387,33 +388,33 @@ function EducationPane() {
   };
 
   return (
-    <div style={{ borderTop: `1px solid ${C.line}`, background: C.card, flexShrink: 0 }}>
-      <div style={{ maxWidth: 560, width: "100%", margin: "0 auto", padding: "13px 18px 15px", boxSizing: "border-box" }}>
-        <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.16em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 7 }}>Good to know</div>
-        <div style={{ fontFamily: SERIF, fontSize: 15, lineHeight: 1.55, color: C.inkSoft }}>
-          Hemp seed and raw flower are <strong style={{ color: C.ink, fontWeight: 700 }}>foods</strong> here — eaten as part of your day, raw, unless your clinician says otherwise. This sheet waits for you: open it whenever suits your week.
-        </div>
-        {!showCal ? (
-          <button className="a1c-info" onClick={() => setShowCal(true)} style={{ fontFamily: MONO, fontSize: 14, letterSpacing: "0.04em", color: C.accentDeep, background: "none", border: "none", padding: 0, cursor: "pointer", marginTop: 9, fontWeight: 700 }}>
-            + Add a weekly reminder to your calendar
+    <div role="tabpanel" className="a1c-fade">
+      <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.6, color: C.inkSoft, margin: "0 0 20px" }}>
+        Hemp seed and raw flower are <strong style={{ color: C.ink, fontWeight: 700 }}>foods</strong> here — eaten as part of your day, raw, unless your clinician says otherwise. This check-in sheet waits for you: open it whenever suits your week.
+      </p>
+      <div style={{ height: 1, background: C.lineSoft, margin: "0 0 18px" }} />
+      <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 12 }}>Reminder</div>
+      {!showCal ? (
+        <button className="a1c-info" onClick={() => setShowCal(true)}
+                style={{ fontFamily: MONO, fontSize: 14, letterSpacing: "0.04em", color: C.accentDeep, background: "none", border: "none", padding: 0, cursor: "pointer", fontWeight: 700 }}>
+          + Add a weekly reminder to your calendar
+        </button>
+      ) : (
+        <div className="a1c-fade" style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span style={{ fontFamily: SERIF, fontSize: 14, color: C.inkSoft }}>Remind me on</span>
+          <select value={calDay} onChange={(e) => setCalDay(Number(e.target.value))}
+                  style={{ fontFamily: SERIF, fontSize: 14, padding: "6px 9px", borderRadius: 4, border: `1px solid ${C.line}`, background: C.pageBg, color: C.ink }}>
+            {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((d, i) => (
+              <option key={d} value={i}>{d}s</option>
+            ))}
+          </select>
+          <button className="a1c-btn a1c-primary" onClick={buildAndDownload}
+                  style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 700, color: C.card, background: C.accent, border: "none", borderRadius: 4, padding: "7px 14px", cursor: "pointer" }}>
+            Save reminder
           </button>
-        ) : (
-          <div className="a1c-fade" style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <span style={{ fontFamily: SERIF, fontSize: 14, color: C.inkSoft }}>Remind me on</span>
-            <select value={calDay} onChange={(e) => setCalDay(Number(e.target.value))}
-                    style={{ fontFamily: SERIF, fontSize: 14, padding: "6px 9px", borderRadius: 4, border: `1px solid ${C.line}`, background: C.pageBg, color: C.ink }}>
-              {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((d, i) => (
-                <option key={d} value={i}>{d}s</option>
-              ))}
-            </select>
-            <button className="a1c-btn a1c-primary" onClick={buildAndDownload}
-                    style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 700, color: C.card, background: C.accent, border: "none", borderRadius: 4, padding: "7px 14px", cursor: "pointer" }}>
-              Save reminder
-            </button>
-            <a ref={linkRef} style={{ display: "none" }}>.ics</a>
-          </div>
-        )}
-      </div>
+          <a ref={linkRef} style={{ display: "none" }}>.ics</a>
+        </div>
+      )}
     </div>
   );
 }
@@ -862,6 +863,7 @@ export default function WeeklyCheckInPage() {
               <div role="tablist" aria-label="Check-in sections" style={{ display: "flex", gap: 7, marginBottom: 22 }}>
                 <Tab id="objective" active={tab} onClick={setTab} sub="for science">Intake &amp; measures</Tab>
                 <Tab id="subjective" active={tab} onClick={setTab} sub="how it felt">This week</Tab>
+                <Tab id="info" active={tab} onClick={setTab} sub="study notes">Info</Tab>
               </div>
 
               {tab === "objective" ? (
@@ -941,6 +943,8 @@ export default function WeeklyCheckInPage() {
                     </ExpandGroup>
                   </div>
                 </div>
+              ) : tab === "info" ? (
+                <InfoTab />
               ) : (
                 <div role="tabpanel" className="a1c-fade">
                   <p style={prose}>A quick read on each, 1 to 5. Your sense of the week is enough — blank is a fine answer.</p>
@@ -958,8 +962,6 @@ export default function WeeklyCheckInPage() {
           )}
         </div>
       </div>
-
-      <EducationPane />
 
       {toast && (
         <div className="a1c-fade" style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", bottom: 148, background: C.ink, color: C.card, fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.45, padding: "11px 16px", borderRadius: 6, maxWidth: 360, textAlign: "center", zIndex: 60 }}>
