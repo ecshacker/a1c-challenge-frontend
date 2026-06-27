@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "The A1C Challenge",
     description: "A shared, open look at whether hemp seed and raw cannabis flower shift blood-sugar control over four weeks.",
-    url: "https://a1c-challenge.org",
+    url: "https://a1c-challenge.org/read-more",
     siteName: "The A1C Challenge",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "The A1C Challenge" }],
     type: "website",
