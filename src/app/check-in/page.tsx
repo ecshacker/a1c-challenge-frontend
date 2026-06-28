@@ -28,6 +28,16 @@ const EXERCISE_TYPE_MAP: Record<string, string> = { "Aerobic": "aerobic", "Resis
 const MED_CHANGE_MAP: Record<string, string> = { "No changes": "no_changes", "Dose reduced": "dose_reduced", "Medication stopped": "medication_stopped", "New med added": "new_med_added" };
 const STD_CARE_MAP: Record<string, string> = { "No": "no", "Scheduled visit": "yes_scheduled_visit", "Lab A1C": "yes_lab_a1c", "Other": "yes_other" };
 
+function reverseMap(m: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(Object.entries(m).map(([k, v]) => [v, k]));
+}
+const CANN_METHOD_REV  = reverseMap(CANN_METHOD_MAP);
+const CANN_STRAIN_REV  = reverseMap(CANN_STRAIN_MAP);
+const EXERCISE_DAYS_REV = reverseMap(EXERCISE_DAYS_MAP);
+const EXERCISE_TYPE_REV = reverseMap(EXERCISE_TYPE_MAP);
+const MED_CHANGE_REV   = reverseMap(MED_CHANGE_MAP);
+const STD_CARE_REV     = reverseMap(STD_CARE_MAP);
+
 // Returns ISO day of week: 1=Mon … 7=Sun
 function todayDayOffset(): number {
   const d = new Date().getDay();
@@ -757,17 +767,48 @@ export default function WeeklyCheckInPage() {
   const handleWeekSelect = (w: number) => {
     setSelectedWeek(w);
     if (w === 0) return; // baseline fields already loaded at mount
-    // Reset weekly fields then fetch and restore draft for the selected week
     resetWeeklyFields();
-    api.get(`/checkins/draft?studyWeek=${w}`)
-      .then((draft) => {
-        if (!draft) return;
-        const d = (draft as { draftData: Record<string, unknown> }).draftData;
-        if (d) restoreDraftFields(d);
-      })
-      .catch((err) => {
-        if (err instanceof ApiError && (err.status === 404 || err.status === 400)) return; // no draft — fine
-      });
+    if (submittedWeeksRef.current.includes(w)) {
+      // Week already submitted — load from checkins record (read-only display)
+      api.get(`/checkins/${w}`)
+        .then((c) => {
+          if (!c) return;
+          const r = c as Record<string, unknown>;
+          const toBool = (v: unknown): boolean | null => v === true ? true : v === false ? false : null;
+          setHemp([toBool(r.hempDayMon), toBool(r.hempDayTue), toBool(r.hempDayWed), toBool(r.hempDayThu), toBool(r.hempDayFri), toBool(r.hempDaySat), toBool(r.hempDaySun)]);
+          setCannabis([toBool(r.cannabisDayMon), toBool(r.cannabisDayTue), toBool(r.cannabisDayWed), toBool(r.cannabisDayThu), toBool(r.cannabisDayFri), toBool(r.cannabisDaySat), toBool(r.cannabisDaySun)]);
+          setHempAmt(r.hempAmountG != null ? String(r.hempAmountG) : "");
+          setCannAmt(r.cannabisAmountG != null ? String(r.cannabisAmountG) : "");
+          setCannMethod(CANN_METHOD_REV[r.cannabisMethod as string] ?? "");
+          setCannStrain(CANN_STRAIN_REV[r.cannabisStrainType as string] ?? "");
+          setGlucoseUnit((r.glucoseUnit as string) ?? "mgdl");
+          setGlucoseDays([r.glucoseMon, r.glucoseTue, r.glucoseWed, r.glucoseThu, r.glucoseFri, r.glucoseSat, r.glucoseSun].map(v => v != null ? String(v) : ""));
+          setCgmTir(r.cgmTirPct != null ? String(r.cgmTirPct) : "");
+          setCgmTar(r.cgmTarPct != null ? String(r.cgmTarPct) : "");
+          setCgmTbr(r.cgmTbrPct != null ? String(r.cgmTbrPct) : "");
+          setCgmCv(r.cgmCvPct != null ? String(r.cgmCvPct) : "");
+          setExDays(EXERCISE_DAYS_REV[r.exerciseDays as string] ?? "");
+          setExType(EXERCISE_TYPE_REV[r.exerciseTypeThisWeek as string] ?? "");
+          setWb({ energy: (r.wbEnergy as number) ?? null, mood: (r.wbMood as number) ?? null, digestion: (r.wbDigestion as number) ?? null, sleep: (r.wbSleep as number) ?? null, hydration: (r.wbHydration as number) ?? null, comfort: (r.wbPain as number) ?? null });
+          setWeight(r.weightValue != null ? String(r.weightValue) : "");
+          setUnit((r.weightUnit === "lbs" ? "lb" : r.weightUnit as string) ?? "lb");
+          setMedChange(MED_CHANGE_REV[r.medicationChange as string] ?? "");
+          setStdCare(STD_CARE_REV[r.standardCareContact as string] ?? "");
+          setNote((r.freeTextNote as string) ?? "");
+        })
+        .catch(() => { /* show blank if fetch fails — week is still marked submitted */ });
+    } else {
+      // Unsubmitted week — load draft if one exists
+      api.get(`/checkins/draft?studyWeek=${w}`)
+        .then((draft) => {
+          if (!draft) return;
+          const d = (draft as { draftData: Record<string, unknown> }).draftData;
+          if (d) restoreDraftFields(d);
+        })
+        .catch((err) => {
+          if (err instanceof ApiError && (err.status === 404 || err.status === 400)) return;
+        });
+    }
   };
 
   const submitCheckIn = async () => {
