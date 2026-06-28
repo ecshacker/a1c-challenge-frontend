@@ -205,7 +205,7 @@ export default function MilestonePage() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  const milestoneType = studyWeek <= 4 ? "week_4" : "week_8";
+  const milestoneType = studyWeek <= 4 ? "four_week" : studyWeek <= 8 ? "eight_week" : "continuation";
 
   const canSubmit = !!a1c && !!a1cHow && (fruct ? !!fructHow : true);
 
@@ -347,10 +347,10 @@ export default function MilestonePage() {
                 Invite someone like you
               </button>
               {studyWeek <= 4 && (
-                <button className="a1c-btn a1c-primary" onClick={() => setToast("Heading to week 5.")}
-                        style={{ flex: 1.3, fontFamily: SERIF, fontSize: 16.5, fontWeight: 700, color: C.card, background: C.accent, border: "none", borderRadius: 6, padding: "14px", cursor: "pointer" }}>
+                <a href="/check-in"
+                   style={{ flex: 1.3, fontFamily: SERIF, fontSize: 16.5, fontWeight: 700, color: C.card, background: C.accent, borderRadius: 6, padding: "14px", cursor: "pointer", textDecoration: "none", textAlign: "center" }}>
                   Keep going to week 8
-                </button>
+                </a>
               )}
             </div>
             <p style={{ fontFamily: SERIF, fontSize: 12.5, color: C.inkFaint, margin: "10px 2px 0", textAlign: "center" }}>

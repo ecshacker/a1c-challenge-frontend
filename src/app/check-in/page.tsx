@@ -549,6 +549,7 @@ export default function WeeklyCheckInPage() {
   const [currentWeek,    setCurrentWeek]    = useState<number>(1);
   const [selectedWeek,   setSelectedWeek]   = useState<number>(1);
   const [submittedWeeks, setSubmittedWeeks] = useState<number[]>([]);
+  const [submittedMilestoneWeeks, setSubmittedMilestoneWeeks] = useState<number[]>([]);
   const [baselineEditable, setBaselineEditable] = useState(true);
   const [mountError,     setMountError]     = useState<string | null>(null);
 
@@ -688,6 +689,7 @@ export default function WeeklyCheckInPage() {
         // Fetch submitted weeks and draft in parallel
         return Promise.all([
           api.get("/checkins/submitted-weeks"),
+          api.get("/milestones/status").catch(() => null),
           api.get(`/checkins/draft?studyWeek=${resolvedWeek}`).catch((err) => {
             if (err instanceof ApiError && (err.status === 404 || err.status === 400)) return null;
             throw err;
@@ -696,8 +698,13 @@ export default function WeeklyCheckInPage() {
       })
       .then((results) => {
         if (!results) return;
-        const [swData, draft] = results as [{ submittedWeeks: number[] } | null, { draftData: Record<string, unknown> } | null];
+        const [swData, msData, draft] = results as [
+          { submittedWeeks: number[] } | null,
+          { submittedMilestoneWeeks: number[] } | null,
+          { draftData: Record<string, unknown> } | null,
+        ];
         if (swData?.submittedWeeks) setSubmittedWeeks(swData.submittedWeeks);
+        if (msData?.submittedMilestoneWeeks) setSubmittedMilestoneWeeks(msData.submittedMilestoneWeeks);
         if (draft?.draftData) restoreDraftFields(draft.draftData);
       })
       .catch((err) => {
@@ -967,6 +974,25 @@ export default function WeeklyCheckInPage() {
             <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginTop: 7 }}>
               Saving automatically · lock in when you&rsquo;re done
             </div>
+          )}
+
+          {/* Milestone CTA — shown when week 4 or 8 is locked but milestone not yet filed */}
+          {([4, 8] as number[]).map(mw =>
+            submittedWeeks.includes(mw) ? (
+              submittedMilestoneWeeks.includes(mw) ? (
+                <div key={mw} style={{ fontFamily: MONO, fontSize: 12, color: C.accentDeep, marginTop: 7 }}>
+                  Week {mw} milestone recorded ✓
+                </div>
+              ) : (
+                <a key={mw} href="/milestone"
+                   style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10, padding: "10px 14px", background: C.accentTint, border: `1px solid ${C.accent}`, borderRadius: 6, textDecoration: "none", gap: 10 }}>
+                  <span style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 700, color: C.accentDeep }}>
+                    Week {mw} milestone — record your A1C reading
+                  </span>
+                  <span style={{ fontFamily: MONO, fontSize: 14, color: C.accentDeep }}>→</span>
+                </a>
+              )
+            ) : null
           )}
 
           <div style={{ height: 1, background: C.line, margin: "14px 0 18px" }} />
