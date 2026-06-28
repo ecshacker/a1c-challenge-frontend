@@ -94,12 +94,12 @@ Then I'll put study launch date a week prior to that, to simulate it having been
 
 ```sql
 // week 1 is 6/1 (current week is 4)
-update study_config set launch_date = '2026-05-29';
+update study_config set launch_date = '2026-05-22';
 // participant start date of 6/1 makes current week 4
-update participants set start_date = '2026-06-01' where start_date = '2026-06-08';
+update participants set start_date = '2026-05-25' where start_date = '2026-06-01';
 ```
 
-I believe week 4 being editable and some new button shows up for the milestone; this is untested territory.
+Week 4 is editable and a new button to enter Milestone numbers shows up when the user locks week 4.
 
 ### Analysis/Reset
 

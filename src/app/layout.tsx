@@ -17,14 +17,14 @@ export const metadata: Metadata = {
     description: "A shared, open look at whether hemp seed and raw cannabis flower shift blood-sugar control over four weeks.",
     url: "https://a1c-challenge.org/read-more",
     siteName: "The A1C Challenge",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "The A1C Challenge" }],
+    images: [{ url: "/og-image-eatit.jpg", width: 1312, height: 664, alt: "The A1C Challenge" }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "The A1C Challenge",
     description: "A shared, open look at whether hemp seed and raw cannabis flower shift blood-sugar control over four weeks.",
-    images: ["/og-image.jpg"],
+    images: ["/og-image-eatit.jpg"],
   },
 };
 
