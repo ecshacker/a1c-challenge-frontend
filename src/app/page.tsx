@@ -36,6 +36,13 @@ function IconInstagram() {
     </svg>
   );
 }
+function IconX() {
+  return (
+    <svg viewBox="0 0 24 24" width={18} height={18} fill="currentColor" aria-hidden>
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L2.25 2.25h6.963l4.259 5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  );
+}
 function IconTikTok() {
   return (
     <svg viewBox="0 0 24 24" width={18} height={18} fill="currentColor" aria-hidden>
@@ -122,11 +129,43 @@ function SiteFooter() {
     }
   }, [flashToast]);
 
+  const shareChip: React.CSSProperties = {
+    display: "inline-flex", alignItems: "center", gap: 7,
+    padding: "7px 13px", borderRadius: 20,
+    background: "transparent", border: `1px solid ${C.line}`,
+    textDecoration: "none", cursor: "pointer", color: C.inkSoft,
+    fontFamily: SERIF, fontSize: 15, fontWeight: 600,
+  };
+
   return (
     <div style={{ marginTop: 48, paddingTop: 20, borderTop: `1px solid ${C.line}` }}>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
+      {/* Share section */}
+      <div style={{ fontFamily: SERIF, fontSize: 14, color: C.inkFaint, marginBottom: 10 }}>
+        Do you know someone that would be interested in this study?
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginBottom: 18 }}>
+        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_URL)}`}
+           target="_blank" rel="noopener noreferrer" style={shareChip}>
+          <IconFacebook /> Facebook
+        </a>
+        <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SHARE_URL)}`}
+           target="_blank" rel="noopener noreferrer" style={shareChip}>
+          <IconLinkedIn /> LinkedIn
+        </a>
+        <button onClick={() => copyShare("Instagram")} style={shareChip}>
+          <IconInstagram /> Instagram
+        </button>
+        <button onClick={() => copyShare("TikTok")} style={shareChip}>
+          <IconTikTok /> TikTok
+        </button>
+        <a href={`https://x.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(SHARE_URL)}`}
+           target="_blank" rel="noopener noreferrer" style={shareChip}>
+          <IconX /> X
+        </a>
+      </div>
 
-        {/* Left: identity + terms */}
+      {/* Identity row */}
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <span style={{ fontFamily: MONO, fontSize: 12.5, color: C.inkFaint }}>
             The A1C Challenge · a1c-challenge.org
@@ -138,29 +177,7 @@ function SiteFooter() {
             <IconDocument /> Terms
           </Link>
         </div>
-
-        {/* Right: icon groups */}
         <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {/* Share icons */}
-          <IconBtn label="Share on Facebook"
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_URL)}`}>
-            <IconFacebook />
-          </IconBtn>
-          <IconBtn label="Share on LinkedIn"
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SHARE_URL)}`}>
-            <IconLinkedIn />
-          </IconBtn>
-          <IconBtn label="Share on Instagram" onClick={() => copyShare("Instagram")}>
-            <IconInstagram />
-          </IconBtn>
-          <IconBtn label="Share on TikTok" onClick={() => copyShare("TikTok")}>
-            <IconTikTok />
-          </IconBtn>
-
-          {/* Divider */}
-          <span style={{ width: 1, height: 20, background: C.line, margin: "0 6px", display: "inline-block" }} />
-
-          {/* Study links */}
           <IconBtn label="Study pre-registration (OSF)" href="https://osf.io/r4ufg/overview">
             <IconOSF />
           </IconBtn>

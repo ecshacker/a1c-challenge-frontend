@@ -7,6 +7,7 @@ import { getToken } from "@/lib/token";
 import { C, SERIF, MONO } from "@/lib/theme";
 const DAY_LETTERS = ["M", "T", "W", "T", "F", "S", "S"];
 const SITE_URL    = "https://a1c-challenge.org";
+const SHARE_URL= SITE_URL + "/read-more";
 const SHARE_TEXT  = "The A1C Challenge — a shared, open look at whether hemp seed and raw cannabis flower shift blood-sugar control over four weeks.";
 
 const WELLBEING = [
@@ -392,10 +393,10 @@ function InfoTab() {
 
   const copyShare = async (platform: string) => {
     if (navigator.share) {
-      try { await navigator.share({ title: "The A1C Challenge", text: SHARE_TEXT, url: SITE_URL }); return; }
+      try { await navigator.share({ title: "The A1C Challenge", text: SHARE_TEXT, url: SHARE_URL }); return; }
       catch { /* fallthrough to clipboard */ }
     }
-    await navigator.clipboard.writeText(SITE_URL);
+    await navigator.clipboard.writeText(SHARE_URL);
     setShareToast(`Link copied — share on ${platform}`);
     setTimeout(() => setShareToast(""), 2600);
   };
@@ -421,12 +422,12 @@ function InfoTab() {
         Everyone knows someone. Help us get more participants by sharing with those you know. Just the link to the study, not your numbers.
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginBottom: 16 }}>
-        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`}
+        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_URL)}`}
            target="_blank" rel="noopener noreferrer" style={shareChip}>
           <svg viewBox="0 0 24 24" width={15} height={15} fill="currentColor" aria-hidden><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
           Facebook
         </a>
-        <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SITE_URL)}`}
+        <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SHARE_URL)}`}
            target="_blank" rel="noopener noreferrer" style={shareChip}>
           <svg viewBox="0 0 24 24" width={15} height={15} fill="currentColor" aria-hidden>
             <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
@@ -447,6 +448,13 @@ function InfoTab() {
           </svg>
           TikTok
         </button>
+        <a href={`https://x.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(SHARE_URL)}`}
+           target="_blank" rel="noopener noreferrer" style={shareChip}>
+          <svg viewBox="0 0 24 24" width={15} height={15} fill="currentColor" aria-hidden>
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L2.25 2.25h6.963l4.259 5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          X
+        </a>
       </div>
       {shareToast && (
         <div className="a1c-fade" style={{ fontFamily: MONO, fontSize: 13.5, color: C.accentDeep, marginBottom: 16 }}>
@@ -901,10 +909,16 @@ export default function WeeklyCheckInPage() {
                   </div>
                 : <button onClick={onDone} disabled={submitting}
                           style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 700, color: C.card, background: C.accent, border: "none", borderRadius: 5, padding: "8px 14px", cursor: "pointer", whiteSpace: "nowrap", marginTop: 2, opacity: submitting ? 0.6 : 1 }}>
-                    {submitting ? "Submitting…" : `Submit week ${selectedWeek} →`}
+                    {submitting ? "Submitting…" : `Lock in week ${selectedWeek}`}
                   </button>
             )}
           </div>
+
+          {selectedWeek > 0 && !isWeekSubmitted && (
+            <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginTop: 7 }}>
+              Saving automatically · lock in when you&rsquo;re done
+            </div>
+          )}
 
           <div style={{ height: 1, background: C.line, margin: "14px 0 18px" }} />
 
@@ -1035,17 +1049,17 @@ export default function WeeklyCheckInPage() {
 
       {confirmStep === "ask" && (
         <Modal>
-          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep }}>Before you submit</div>
-          <div style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 700, color: C.ink, margin: "10px 0 12px", lineHeight: 1.3 }}>Submit week {selectedWeek} to the study?</div>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep }}>Almost done</div>
+          <div style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 700, color: C.ink, margin: "10px 0 12px", lineHeight: 1.3 }}>Lock in week {selectedWeek}?</div>
           <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft, margin: 0 }}>
             You filled in {wbDone} of the six reads on <em>This week</em>. Blank is a fine answer — fill the rest only if something comes to mind.
           </p>
           <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.6, color: C.inkFaint, margin: "12px 0 0" }}>
-            This enters your data into the study. You won&rsquo;t be able to change it after submitting.
+            Your data has been saving automatically. Locking in confirms you&rsquo;re done for the week — entries can&rsquo;t be changed after that.
           </p>
           <div style={{ display: "flex", gap: 12, marginTop: 22 }}>
             <button className="a1c-btn a1c-secondary" onClick={() => setConfirmStep(null)} style={{ ...btnSecondary, flex: 1 }}>Keep editing</button>
-            <button className="a1c-btn a1c-primary" onClick={() => { setConfirmStep(null); submitCheckIn(); }} style={{ ...btnPrimary, flex: 1 }}>Submit to study</button>
+            <button className="a1c-btn a1c-primary" onClick={() => { setConfirmStep(null); submitCheckIn(); }} style={{ ...btnPrimary, flex: 1 }}>Lock it in</button>
           </div>
         </Modal>
       )}
