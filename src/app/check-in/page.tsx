@@ -455,6 +455,13 @@ function InfoTab() {
           </svg>
           X
         </a>
+        <a href={`https://gab.com/compose?url=${encodeURIComponent(SHARE_URL)}&text=${encodeURIComponent(SHARE_TEXT)}`}
+           target="_blank" rel="noopener noreferrer" style={shareChip}>
+          <svg viewBox="0 0 24 24" width={15} height={15} fill="currentColor" aria-hidden>
+            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm3.5 7h-4v1.5h3.75A3.75 3.75 0 0 1 11.5 15.5H10V17h1.5A5.25 5.25 0 0 0 17 11.75V9.5a.5.5 0 0 0-.5-.5H15.5zm-7 0a.5.5 0 0 0-.5.5v5a.5.5 0 0 0 .5.5H10v-1.5H9V10h1V8.5H8.5z"/>
+          </svg>
+          Gab
+        </a>
       </div>
       {shareToast && (
         <div className="a1c-fade" style={{ fontFamily: MONO, fontSize: 13.5, color: C.accentDeep, marginBottom: 16 }}>

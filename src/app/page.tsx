@@ -43,6 +43,13 @@ function IconX() {
     </svg>
   );
 }
+function IconGab() {
+  return (
+    <svg viewBox="0 0 24 24" width={18} height={18} fill="currentColor" aria-hidden>
+      <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm3.5 7h-4v1.5h3.75A3.75 3.75 0 0 1 11.5 15.5H10V17h1.5A5.25 5.25 0 0 0 17 11.75V9.5a.5.5 0 0 0-.5-.5H15.5zm-7 0a.5.5 0 0 0-.5.5v5a.5.5 0 0 0 .5.5H10v-1.5H9V10h1V8.5H8.5z"/>
+    </svg>
+  );
+}
 function IconTikTok() {
   return (
     <svg viewBox="0 0 24 24" width={18} height={18} fill="currentColor" aria-hidden>
@@ -134,7 +141,7 @@ function SiteFooter() {
     padding: "7px 13px", borderRadius: 20,
     background: "transparent", border: `1px solid ${C.line}`,
     textDecoration: "none", cursor: "pointer", color: C.inkSoft,
-    fontFamily: SERIF, fontSize: 15, fontWeight: 600,
+    fontFamily: SERIF, fontSize: 14, fontWeight: 600,
   };
 
   return (
@@ -161,6 +168,10 @@ function SiteFooter() {
         <a href={`https://x.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(SHARE_URL)}`}
            target="_blank" rel="noopener noreferrer" style={shareChip}>
           <IconX /> X
+        </a>
+        <a href={`https://gab.com/compose?url=${encodeURIComponent(SHARE_URL)}&text=${encodeURIComponent(SHARE_TEXT)}`}
+           target="_blank" rel="noopener noreferrer" style={shareChip}>
+          <IconGab /> Gab
         </a>
       </div>
 
@@ -286,13 +297,13 @@ function HypothesisBlock() {
   return (
     <div style={{ marginTop: 44, padding: "26px 18px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
       <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accentDeep, marginBottom: 18 }}>Why would food move blood sugar at all?</div>
-      <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 16px" }}>
+      <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 16px" }}>
         Consider scurvy. For centuries it looked like a disease — sailors wasted away from it — until it turned out to be something simpler: a missing nutrient. Give the body vitamin C, and it repairs itself. No drug. Just the input it had been lacking.
       </p>
-      <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 16px" }}>
+      <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 16px" }}>
         This study asks a careful version of that question for blood sugar. Not whether a food can push the number down — but whether the body&rsquo;s been missing an input, and rights itself once it has it back.
       </p>
-      <p style={{ fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.65, color: C.ink, margin: "0 0 20px", fontStyle: "italic" }}>
+      <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: C.ink, margin: "0 0 20px", fontStyle: "italic" }}>
         The study is built so that if the answer is no, that shows too — in public.
       </p>
       <button onClick={() => setCurious(!curious)}
@@ -305,13 +316,13 @@ function HypothesisBlock() {
       {curious && (
         <div className="a1c-fade" style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${C.lineSoft}` }}>
           <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 12 }}>How will we know?</div>
-            <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 12px" }}>
+            <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 12px" }}>
                 Blood sugar leaves two marks at two speeds: fructosamine reflects the last few weeks, A1C the last few months. Both can move — a drug that simply holds glucose down would move them too. So the question isn&rsquo;t whether they move, but in what order.
             </p>
-            <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 12px" }}>
+            <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 12px" }}>
                 If the correction is real and upstream, the faster mark shifts first and the slower one follows. That ordering is the signature of a nutritional correction — the pattern you&rsquo;d expect if a condition like Type 2 Diabetes had a nutritional component, not only a glucose to be pushed down.
             </p>
-            <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 12px" }}>
+            <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: C.inkSoft, margin: "0 0 12px" }}>
                 Even then it wouldn&rsquo;t be proof: if both marks move more than standard care would predict, that&rsquo;s striking — and still doesn&rsquo;t rule out other explanations. The ordering is the fingerprint we&rsquo;re watching for, and four weeks is just long enough to see it begin.
             </p>
         </div>
@@ -340,7 +351,7 @@ export default function LandingPage() {
           <h1 style={{ fontFamily: SERIF, fontWeight: 800, fontSize: "clamp(34px, 6vw, 52px)", lineHeight: 1.07, letterSpacing: "-0.02em", margin: "0 0 18px", color: C.ink }}>
             A shared, open look at blood-sugar control
           </h1>
-          <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: C.inkSoft, margin: 0 }}>
+          <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.65, color: C.inkSoft, margin: 0 }}>
             When hemp seed and raw cannabis flower are eaten as food — raw, the flower never heated — does blood-sugar control shift over four weeks? This study asks that question in the open, with every record available for anyone to examine.
           </p>
           <ParticipantBanner />
@@ -386,7 +397,7 @@ export default function LandingPage() {
           ].map(({ head, body }) => (
             <div key={head} style={{ marginBottom: 18, paddingLeft: 16, borderLeft: `2px solid ${C.accent}` }}>
               <div style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 5 }}>{head}</div>
-              <div style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: C.inkSoft }}>{body}</div>
+              <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: C.inkSoft }}>{body}</div>
             </div>
           ))}
         </div>
