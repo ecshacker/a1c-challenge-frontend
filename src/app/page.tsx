@@ -7,6 +7,7 @@ import { getToken } from "@/lib/token";
 import { C, SERIF, MONO } from "@/lib/theme";
 
 const SITE_URL = "https://a1c-challenge.org";
+const SHARE_URL = SITE_URL + "/read-more";
 const SHARE_TEXT = "The A1C Challenge — a shared, open look at whether hemp seed and raw cannabis flower shift blood-sugar control over four weeks.";
 
 /* ---- icon paths ---- */
@@ -109,15 +110,15 @@ function SiteFooter() {
   const copyShare = useCallback(async (platform: string) => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: "The A1C Challenge", text: SHARE_TEXT, url: SITE_URL });
+        await navigator.share({ title: "The A1C Challenge", text: SHARE_TEXT, url: SHARE_URL });
         return;
       } catch { /* user cancelled or not supported */ }
     }
     try {
-      await navigator.clipboard.writeText(SITE_URL);
+      await navigator.clipboard.writeText(SHARE_URL);
       flashToast(`Link copied — share on ${platform}`);
     } catch {
-      flashToast("Copy the link: " + SITE_URL);
+      flashToast("Copy the link: " + SHARE_URL);
     }
   }, [flashToast]);
 
@@ -142,11 +143,11 @@ function SiteFooter() {
         <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
           {/* Share icons */}
           <IconBtn label="Share on Facebook"
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`}>
+            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_URL)}`}>
             <IconFacebook />
           </IconBtn>
           <IconBtn label="Share on LinkedIn"
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SITE_URL)}`}>
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SHARE_URL)}`}>
             <IconLinkedIn />
           </IconBtn>
           <IconBtn label="Share on Instagram" onClick={() => copyShare("Instagram")}>
