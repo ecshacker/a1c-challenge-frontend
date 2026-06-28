@@ -79,7 +79,7 @@ function PickRow({ label, value, set, opts, ro }: { label: string; value: string
 function ExpandGroup({ label, show, onToggle, children }: { label: string; show: boolean; onToggle: () => void; children: React.ReactNode }) {
   return (
     <div style={{ borderTop: `1px solid ${C.lineSoft}`, marginBottom: 2 }}>
-      <button onClick={onToggle} style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: "11px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <button onClick={onToggle} style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: "11px 0", display: "flex", justifyContent: "space-between", alignItems: "center", pointerEvents: "auto" }}>
         <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.08em", color: C.inkFaint }}>{label}</span>
         <span style={{ fontFamily: MONO, fontSize: 16, color: C.inkFaint, lineHeight: 1 }}>{show ? "−" : "+"}</span>
       </button>
