@@ -222,9 +222,10 @@ function PathwayStrip({ current, selected, onSelect, submitted }: {
     { id: 8,  label: "8",   kind: "milestone" },
   ];
 
-  // Selectable: "in" (id=0) always, weeks <= current; milestones are display-only
+  // Selectable: "in" always, any week/milestone <= current (milestones are display-only
+  // unless they are the current week or submitted, in which case they must be reachable)
   const isSelectable = (n: { id: number; kind: string }) =>
-    n.kind !== "milestone" && (n.id === 0 || n.id <= current);
+    n.id === 0 || (n.id <= current && (n.kind !== "milestone" || n.id === current || submitted.includes(n.id)));
 
   const statusLabel = selected === 0
     ? "starting numbers · baseline"
