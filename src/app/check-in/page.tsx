@@ -57,7 +57,7 @@ function dec1(s: string): string {
 
 /* ---- sub-components ---- */
 
-function PickRow({ label, value, set, opts }: { label: string; value: string; set: (v: string) => void; opts: string[] }) {
+function PickRow({ label, value, set, opts, ro }: { label: string; value: string; set: (v: string) => void; opts: string[]; ro?: boolean }) {
   return (
     <div style={{ marginBottom: 14 }}>
       <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkSoft, marginBottom: 7 }}>{label}</div>
@@ -65,8 +65,8 @@ function PickRow({ label, value, set, opts }: { label: string; value: string; se
         {opts.map((o) => {
           const on = value === o;
           return (
-            <button key={o} onClick={() => set(on ? "" : o)}
-                    style={{ fontFamily: MONO, fontSize: 13, padding: "7px 11px", cursor: "pointer", borderRadius: 4, background: on ? C.accent : C.card, color: on ? C.card : C.inkSoft, border: `1px solid ${on ? C.accent : C.line}` }}>
+            <button key={o} onClick={() => set(on ? "" : o)} disabled={ro}
+                    style={{ fontFamily: MONO, fontSize: 13, padding: "7px 11px", cursor: ro ? "default" : "pointer", borderRadius: 4, background: on ? C.accent : C.card, color: on ? C.card : C.inkSoft, border: `1px solid ${on ? C.accent : C.line}` }}>
               {o}
             </button>
           );
@@ -88,14 +88,14 @@ function ExpandGroup({ label, show, onToggle, children }: { label: string; show:
   );
 }
 
-function GlucoseGrid({ days, setDays, unit, setUnit }: { days: string[]; setDays: (v: string[]) => void; unit: string; setUnit: (v: string) => void }) {
+function GlucoseGrid({ days, setDays, unit, setUnit, ro }: { days: string[]; setDays: (v: string[]) => void; unit: string; setUnit: (v: string) => void; ro?: boolean }) {
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
         <span style={{ fontFamily: MONO, fontSize: 13, color: C.inkSoft }}>Unit</span>
         <div style={{ display: "flex", border: `1px solid ${C.line}`, borderRadius: 4, overflow: "hidden" }}>
           {[["mgdl", "mg/dL"], ["mmoll", "mmol/L"]].map(([val, lbl]) => (
-            <button key={val} onClick={() => setUnit(val)} style={{ fontFamily: MONO, fontSize: 13, padding: "7px 12px", border: "none", cursor: "pointer", background: unit === val ? C.accent : C.card, color: unit === val ? C.card : C.inkSoft }}>
+            <button key={val} onClick={() => setUnit(val)} disabled={ro} style={{ fontFamily: MONO, fontSize: 13, padding: "7px 12px", border: "none", cursor: ro ? "default" : "pointer", background: unit === val ? C.accent : C.card, color: unit === val ? C.card : C.inkSoft }}>
               {lbl}
             </button>
           ))}
@@ -106,7 +106,7 @@ function GlucoseGrid({ days, setDays, unit, setUnit }: { days: string[]; setDays
         {DAY_LETTERS.map((d, i) => (
           <div key={i} style={{ textAlign: "center" }}>
             <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginBottom: 4 }}>{d}</div>
-            <input inputMode="decimal" value={days[i]}
+            <input inputMode="decimal" value={days[i]} readOnly={ro}
                    onChange={(e) => { const n = [...days]; n[i] = dec1(e.target.value); setDays(n); }}
                    placeholder="—"
                    style={{ width: "100%", boxSizing: "border-box", fontFamily: MONO, fontSize: 13, padding: "7px 3px", textAlign: "center", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
@@ -309,14 +309,14 @@ function dayStyle(v: boolean | null) {
   return                  { background: C.card,        color: C.inkFaint, border: `1px dashed ${C.line}`,    textDecoration: "none" };
 }
 
-function IntakeRow({ title, hint, days, onTap, had, not, unanswered, amount, setAmount, echo, step = 1 }: {
+function IntakeRow({ title, hint, days, onTap, had, not, unanswered, amount, setAmount, echo, step = 1, ro }: {
   title: string; hint: string; days: (boolean | null)[]; onTap: (i: number) => void;
   had: number; not: number; unanswered: number;
-  amount: string; setAmount: (v: string) => void; echo?: string; step?: number;
+  amount: string; setAmount: (v: string) => void; echo?: string; step?: number; ro?: boolean;
 }) {
   const spinBtn: React.CSSProperties = {
     fontFamily: MONO, fontSize: 18, width: 36, height: 36, border: `1px solid ${C.line}`,
-    borderRadius: 4, background: C.card, color: C.inkSoft, cursor: "pointer", display: "flex",
+    borderRadius: 4, background: C.card, color: C.inkSoft, cursor: ro ? "default" : "pointer", display: "flex",
     alignItems: "center", justifyContent: "center", flexShrink: 0,
   };
   const adjust = (delta: number) => {
@@ -332,8 +332,8 @@ function IntakeRow({ title, hint, days, onTap, had, not, unanswered, amount, set
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 7 }}>
         {days.map((v, i) => (
-          <button key={i} className="a1c-cell" aria-label={`${title} day ${i + 1}: ${v === true ? "had it" : v === false ? "didn't" : "not answered"}`} onClick={() => onTap(i)}
-                  style={{ fontFamily: MONO, fontSize: 16, padding: "13px 0", cursor: "pointer", borderRadius: 4, ...dayStyle(v) }}>
+          <button key={i} className="a1c-cell" disabled={ro} aria-label={`${title} day ${i + 1}: ${v === true ? "had it" : v === false ? "didn't" : "not answered"}`} onClick={() => onTap(i)}
+                  style={{ fontFamily: MONO, fontSize: 16, padding: "13px 0", cursor: ro ? "default" : "pointer", borderRadius: 4, ...dayStyle(v) }}>
             {DAY_LETTERS[i]}
           </button>
         ))}
@@ -344,10 +344,10 @@ function IntakeRow({ title, hint, days, onTap, had, not, unanswered, amount, set
       <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 12, flexWrap: "wrap" }}>
         <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkSoft }}>about how much per day</span>
         <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-          <button style={spinBtn} onClick={() => adjust(-step)} aria-label={`Decrease by ${step}`}>−</button>
-          <input inputMode="decimal" value={amount} onChange={(e) => setAmount(dec1(e.target.value))} placeholder="—"
-                 style={{ fontFamily: MONO, fontSize: 15, width: 60, padding: "8px 10px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink, textAlign: "center" }} />
-          <button style={spinBtn} onClick={() => adjust(step)} aria-label={`Increase by ${step}`}>+</button>
+          <button style={spinBtn} disabled={ro} onClick={() => adjust(-step)} aria-label={`Decrease by ${step}`}>−</button>
+          <input inputMode="decimal" value={amount} readOnly={ro} onChange={(e) => setAmount(dec1(e.target.value))} placeholder="—"
+                 style={{ fontFamily: MONO, fontSize: 15, width: 60, padding: "8px 10px", background: ro ? C.pageBg : C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink, textAlign: "center" }} />
+          <button style={spinBtn} disabled={ro} onClick={() => adjust(step)} aria-label={`Increase by ${step}`}>+</button>
         </div>
         <span style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint }}>g</span>
         {echo && <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>{echo}</span>}
@@ -992,96 +992,107 @@ export default function WeeklyCheckInPage() {
                 <Tab id="info" active={tab} onClick={setTab} sub="study notes">Info</Tab>
               </div>
 
-              {tab === "objective" ? (
-                <div role="tabpanel" className="a1c-fade">
-                  <p style={prose}>Mark each day you had it, eaten as food.</p>
-                  <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, margin: "-10px 0 22px" }}>
-                    tap a day to cycle · <span style={{ color: C.accentDeep }}>had it</span> → <span style={{ textDecoration: "line-through" }}>didn&rsquo;t</span> → clear
-                  </div>
-                  <IntakeRow title="Hemp seed" hint={self ? `your amount · ${self.baselineA1c ? "" : ""}` : ""} days={hemp} onTap={(i) => tapDay(hemp, setHemp, i)} had={had(hemp)} not={not(hemp)} unanswered={7 - hempAnswered}
-                             amount={hempAmt} setAmount={setHempAmt} echo={parseFloat(hempAmt) ? `≈ ${(parseFloat(hempAmt) / 10).toFixed(1)} tbsp` : "1 tbsp ≈ 10 g"} step={10} />
-                  <IntakeRow title="Raw cannabis flower" hint="aim · at least 1 g/day, raw" days={cannabis} onTap={(i) => tapDay(cannabis, setCannabis, i)} had={had(cannabis)} not={not(cannabis)} unanswered={7 - cannAnswered}
-                             amount={cannAmt} setAmount={setCannAmt} />
-                  <div style={{ height: 1, background: C.lineSoft, margin: "24px 0 16px" }} />
-                  <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 13 }}>Measures about you</div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <label style={{ fontFamily: MONO, fontSize: 14.5, color: C.inkSoft, width: 96 }}>Your weight</label>
-                    <input inputMode="decimal" value={weight} onChange={(e) => setWeight(dec1(e.target.value))} placeholder="—"
-                           style={{ fontFamily: MONO, fontSize: 16.5, width: 96, padding: "9px 11px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
-                    <div style={{ display: "flex", border: `1px solid ${C.line}`, borderRadius: 4, overflow: "hidden" }}>
-                      {["kg", "lb"].map((u) => (
-                        <button key={u} className="a1c-unit" onClick={() => setUnit(u)}
-                                style={{ fontFamily: MONO, fontSize: 14.5, padding: "9px 16px", border: "none", cursor: "pointer", background: unit === u ? C.accent : C.card, color: unit === u ? C.card : C.inkSoft }}>
-                          {u}
-                        </button>
-                      ))}
-                    </div>
-                    <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>optional</span>
-                  </div>
-
-                  <div style={{ marginTop: 18 }}>
-                    <ExpandGroup label="Cannabis — method &amp; strain" show={showCann} onToggle={() => setShowCann(s => !s)}>
-                      <PickRow label="How did you have it this week?" value={cannMethod} set={setCannMethod}
-                               opts={["Juice / smoothie", "Eaten directly", "Cold infusion", "Mixed", "None this week"]} />
-                      <PickRow label="Strain type (if known)" value={cannStrain} set={setCannStrain}
-                               opts={["Sativa", "Indica", "Balanced", "Not selected"]} />
-                    </ExpandGroup>
-
-                    <ExpandGroup label="Fasting glucose" show={showGlucose} onToggle={() => setShowGlucose(s => !s)}>
-                      <GlucoseGrid days={glucoseDays} setDays={setGlucoseDays} unit={glucoseUnit} setUnit={setGlucoseUnit} />
-                      {self?.glucoseMonitoringType === "cgm" && (
-                        <div style={{ marginTop: 14 }}>
-                          <ExpandGroup label="CGM metrics" show={showCgm} onToggle={() => setShowCgm(s => !s)}>
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 4 }}>
-                              {([
-                                ["Time in Range", "70–180 · %", cgmTir, setCgmTir],
-                                ["Time Above Range", ">180 · %", cgmTar, setCgmTar],
-                                ["Time Below Range", "<70 · %", cgmTbr, setCgmTbr],
-                                ["CV", "target <36%", cgmCv, setCgmCv],
-                              ] as [string, string, string, (v: string) => void][]).map(([lbl, hint, val, set]) => (
-                                <div key={lbl}>
-                                  <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginBottom: 5 }}>{lbl}</div>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                                    <input inputMode="decimal" value={val} onChange={(e) => set(dec1(e.target.value))} placeholder="—"
-                                           style={{ fontFamily: MONO, fontSize: 15, width: 64, padding: "7px 8px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
-                                    <span style={{ fontFamily: MONO, fontSize: 11, color: C.inkFaint }}>{hint}</span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </ExpandGroup>
-                        </div>
-                      )}
-                    </ExpandGroup>
-
-                    <ExpandGroup label="Exercise this week" show={showExercise} onToggle={() => setShowExercise(s => !s)}>
-                      <PickRow label="Days active" value={exDays} set={setExDays}
-                               opts={["Zero", "1–2 days", "3–4 days", "5+ days"]} />
-                      <PickRow label="Main type" value={exType} set={setExType}
-                               opts={["Aerobic", "Resistance", "Walking", "Mixed", "None"]} />
-                    </ExpandGroup>
-
-                    <ExpandGroup label="Clinical notes" show={showClinical} onToggle={() => setShowClinical(s => !s)}>
-                      <PickRow label="Medication or dose changes this week?" value={medChange} set={setMedChange}
-                               opts={["No changes", "Dose reduced", "Medication stopped", "New med added"]} />
-                      <PickRow label="Standard care contact this week?" value={stdCare} set={setStdCare}
-                               opts={["No", "Scheduled visit", "Lab A1C", "Other"]} />
-                    </ExpandGroup>
-                  </div>
-                </div>
-              ) : tab === "info" ? (
+              {tab === "info" ? (
                 <InfoTab />
               ) : (
-                <div role="tabpanel" className="a1c-fade">
-                  <p style={prose}>A quick read on each, 1 to 5. Your sense of the week is enough — blank is a fine answer.</p>
-                  {WELLBEING.map(({ id, ...rest }) => (
-                    <ScaleRow key={id} {...rest} value={wb[id]} onPick={(v) => setWb({ ...wb, [id]: v })} />
-                  ))}
-                  <div style={{ height: 1, background: C.lineSoft, margin: "22px 0 18px" }} />
-                  <label style={{ fontFamily: MONO, fontSize: 14.5, color: C.inkSoft, display: "block", marginBottom: 9 }}>Anything worth noting</label>
-                  <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3}
-                            placeholder="A change you noticed, a hard week, a question for yourself later…"
-                            style={{ width: "100%", boxSizing: "border-box", fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.6, padding: "13px 15px", background: C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink, resize: "vertical" }} />
+                <div style={{ pointerEvents: isWeekSubmitted ? "none" : undefined }}>
+                  {isWeekSubmitted && (
+                    <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginBottom: 14, padding: "6px 10px", background: C.pageBg, border: `1px solid ${C.line}`, borderRadius: 4, display: "inline-block" }}>
+                      Week {selectedWeek} is locked — viewing recorded data
+                    </div>
+                  )}
+                  {tab === "objective" ? (
+                    <div role="tabpanel" className="a1c-fade">
+                      <p style={prose}>Mark each day you had it, eaten as food.</p>
+                      {!isWeekSubmitted && (
+                        <div style={{ fontFamily: MONO, fontSize: 13, color: C.inkFaint, margin: "-10px 0 22px" }}>
+                          tap a day to cycle · <span style={{ color: C.accentDeep }}>had it</span> → <span style={{ textDecoration: "line-through" }}>didn&rsquo;t</span> → clear
+                        </div>
+                      )}
+                      <IntakeRow title="Hemp seed" hint={self ? `your amount · ${self.baselineA1c ? "" : ""}` : ""} days={hemp} onTap={(i) => tapDay(hemp, setHemp, i)} had={had(hemp)} not={not(hemp)} unanswered={7 - hempAnswered}
+                                 amount={hempAmt} setAmount={setHempAmt} echo={parseFloat(hempAmt) ? `≈ ${(parseFloat(hempAmt) / 10).toFixed(1)} tbsp` : "1 tbsp ≈ 10 g"} step={10} ro={isWeekSubmitted} />
+                      <IntakeRow title="Raw cannabis flower" hint="aim · at least 1 g/day, raw" days={cannabis} onTap={(i) => tapDay(cannabis, setCannabis, i)} had={had(cannabis)} not={not(cannabis)} unanswered={7 - cannAnswered}
+                                 amount={cannAmt} setAmount={setCannAmt} ro={isWeekSubmitted} />
+                      <div style={{ height: 1, background: C.lineSoft, margin: "24px 0 16px" }} />
+                      <div style={{ fontFamily: MONO, fontSize: 13.5, letterSpacing: "0.12em", textTransform: "uppercase", color: C.inkFaint, marginBottom: 13 }}>Measures about you</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <label style={{ fontFamily: MONO, fontSize: 14.5, color: C.inkSoft, width: 96 }}>Your weight</label>
+                        <input inputMode="decimal" value={weight} readOnly={isWeekSubmitted} onChange={(e) => setWeight(dec1(e.target.value))} placeholder="—"
+                               style={{ fontFamily: MONO, fontSize: 16.5, width: 96, padding: "9px 11px", background: isWeekSubmitted ? C.pageBg : C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
+                        <div style={{ display: "flex", border: `1px solid ${C.line}`, borderRadius: 4, overflow: "hidden" }}>
+                          {["kg", "lb"].map((u) => (
+                            <button key={u} className="a1c-unit" disabled={isWeekSubmitted} onClick={() => setUnit(u)}
+                                    style={{ fontFamily: MONO, fontSize: 14.5, padding: "9px 16px", border: "none", cursor: isWeekSubmitted ? "default" : "pointer", background: unit === u ? C.accent : C.card, color: unit === u ? C.card : C.inkSoft }}>
+                              {u}
+                            </button>
+                          ))}
+                        </div>
+                        <span style={{ fontFamily: MONO, fontSize: 13.5, color: C.inkFaint }}>optional</span>
+                      </div>
+
+                      <div style={{ marginTop: 18 }}>
+                        <ExpandGroup label="Cannabis — method &amp; strain" show={showCann} onToggle={() => setShowCann(s => !s)}>
+                          <PickRow label="How did you have it this week?" value={cannMethod} set={setCannMethod} ro={isWeekSubmitted}
+                                   opts={["Juice / smoothie", "Eaten directly", "Cold infusion", "Mixed", "None this week"]} />
+                          <PickRow label="Strain type (if known)" value={cannStrain} set={setCannStrain} ro={isWeekSubmitted}
+                                   opts={["Sativa", "Indica", "Balanced", "Not selected"]} />
+                        </ExpandGroup>
+
+                        <ExpandGroup label="Fasting glucose" show={showGlucose} onToggle={() => setShowGlucose(s => !s)}>
+                          <GlucoseGrid days={glucoseDays} setDays={setGlucoseDays} unit={glucoseUnit} setUnit={setGlucoseUnit} ro={isWeekSubmitted} />
+                          {self?.glucoseMonitoringType === "cgm" && (
+                            <div style={{ marginTop: 14 }}>
+                              <ExpandGroup label="CGM metrics" show={showCgm} onToggle={() => setShowCgm(s => !s)}>
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 4 }}>
+                                  {([
+                                    ["Time in Range", "70–180 · %", cgmTir, setCgmTir],
+                                    ["Time Above Range", ">180 · %", cgmTar, setCgmTar],
+                                    ["Time Below Range", "<70 · %", cgmTbr, setCgmTbr],
+                                    ["CV", "target <36%", cgmCv, setCgmCv],
+                                  ] as [string, string, string, (v: string) => void][]).map(([lbl, hint, val, set]) => (
+                                    <div key={lbl}>
+                                      <div style={{ fontFamily: MONO, fontSize: 12, color: C.inkFaint, marginBottom: 5 }}>{lbl}</div>
+                                      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                                        <input inputMode="decimal" value={val} readOnly={isWeekSubmitted} onChange={(e) => set(dec1(e.target.value))} placeholder="—"
+                                               style={{ fontFamily: MONO, fontSize: 15, width: 64, padding: "7px 8px", background: isWeekSubmitted ? C.pageBg : C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink }} />
+                                        <span style={{ fontFamily: MONO, fontSize: 11, color: C.inkFaint }}>{hint}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </ExpandGroup>
+                            </div>
+                          )}
+                        </ExpandGroup>
+
+                        <ExpandGroup label="Exercise this week" show={showExercise} onToggle={() => setShowExercise(s => !s)}>
+                          <PickRow label="Days active" value={exDays} set={setExDays} ro={isWeekSubmitted}
+                                   opts={["Zero", "1–2 days", "3–4 days", "5+ days"]} />
+                          <PickRow label="Main type" value={exType} set={setExType} ro={isWeekSubmitted}
+                                   opts={["Aerobic", "Resistance", "Walking", "Mixed", "None"]} />
+                        </ExpandGroup>
+
+                        <ExpandGroup label="Clinical notes" show={showClinical} onToggle={() => setShowClinical(s => !s)}>
+                          <PickRow label="Medication or dose changes this week?" value={medChange} set={setMedChange} ro={isWeekSubmitted}
+                                   opts={["No changes", "Dose reduced", "Medication stopped", "New med added"]} />
+                          <PickRow label="Standard care contact this week?" value={stdCare} set={setStdCare} ro={isWeekSubmitted}
+                                   opts={["No", "Scheduled visit", "Lab A1C", "Other"]} />
+                        </ExpandGroup>
+                      </div>
+                    </div>
+                  ) : (
+                    <div role="tabpanel" className="a1c-fade">
+                      <p style={prose}>A quick read on each, 1 to 5. Your sense of the week is enough — blank is a fine answer.</p>
+                      {WELLBEING.map(({ id, ...rest }) => (
+                        <ScaleRow key={id} {...rest} value={wb[id]} onPick={(v) => setWb({ ...wb, [id]: v })} />
+                      ))}
+                      <div style={{ height: 1, background: C.lineSoft, margin: "22px 0 18px" }} />
+                      <label style={{ fontFamily: MONO, fontSize: 14.5, color: C.inkSoft, display: "block", marginBottom: 9 }}>Anything worth noting</label>
+                      <textarea value={note} readOnly={isWeekSubmitted} onChange={(e) => setNote(e.target.value)} rows={3}
+                                placeholder="A change you noticed, a hard week, a question for yourself later…"
+                                style={{ width: "100%", boxSizing: "border-box", fontFamily: SERIF, fontSize: 16.5, lineHeight: 1.6, padding: "13px 15px", background: isWeekSubmitted ? C.pageBg : C.card, border: `1px solid ${C.line}`, borderRadius: 4, color: C.ink, resize: "vertical" }} />
+                    </div>
+                  )}
                 </div>
               )}
             </>

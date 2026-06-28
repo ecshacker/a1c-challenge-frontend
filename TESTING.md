@@ -68,7 +68,7 @@ Then I'll put study launch date a week prior to that, to simulate it having been
 
 ```sql
 // week 1 is 6/8 (current week is 3)
-date study_config set launch_date = '2026-06-05';
+update study_config set launch_date = '2026-06-05';
 // participant start date of 6/8 makes current week 3
 update participants set start_date = '2026-06-08' where start_date = '2026-06-15';
 ```
